@@ -28,10 +28,10 @@ class Another_Unit_Converter_Plugin {
     }
 
     public function init() {
-        add_filter( 'the_content', array( $this, 'extract_currency_amounts' ) );
+        add_filter( 'the_content', array( $this, 'format_currency_amounts' ) );
     }
 
-    public function extract_currency_amounts( $content ) {
+    public function format_currency_amounts( $content ) {
         $currency_amounts = $this->find_currency_amounts( $content );
 
         if ( ! $currency_amounts ) {
