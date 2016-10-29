@@ -32,17 +32,27 @@ class Another_Unit_Converter_Plugin {
     }
 
     public function extract_currency_amounts( $content ) {
-        $filtered_content = strip_tags( $content );
+        $currency_amounts = $this->find_currency_amounts( $content );
 
-        var_dump( $content, $filtered_content );
-
-        $regexp = '/(*UTF8)([A-Z]{0,4}[^\w\d\s]?)(\d{4,}|\d{1,3}(?:[,.]\d{1,3})*)/u';
-
-        if ( ! preg_match_all( $regexp, $filtered_content, $matches, PREG_OFFSET_CAPTURE ) ) {
+        if ( ! $currency_amounts ) {
             return $content;
         }
 
-        $extracted_amounts = array();
+        foreach ( $currency_amounts as $amount_text => $formatted_text ) {
+            $content = str_replace( $amount_text, $formatted_text, $content );
+        }
+
+        return $content;
+    }
+
+    private function find_currency_amounts( $content ) {
+        $currency_amounts = array();
+
+        $regexp = '/(*UTF8)([A-Z]{0,4}[^\w\d\s]?)(\d{4,}|\d{1,3}(?:[,.]\d{1,3})*)/u';
+
+        if ( ! preg_match_all( $regexp, strip_tags( $content ), $matches, PREG_OFFSET_CAPTURE ) ) {
+            return $content;
+        }
 
         foreach ( $matches[0] as $index => $match ) {
             $amount_text = $match[0];
@@ -50,19 +60,32 @@ class Another_Unit_Converter_Plugin {
             $amount_number = $matches[2][ $index ][0];
 
             try {
-                $extracted_amounts[ $amount_text ] = $this->currency_parser->parse_amount(
+                $extracted_amount = $this->currency_parser->parse_amount(
                     $amount_text,
                     $amount_symbol,
                     $amount_number
                 );
+
+                // TODO: Why the try-catch if we are returning null on failure?
+                if ( is_null( $extracted_amount ) ) {
+                    continue;
+                }
+
+                $formatted_text = sprintf(
+                    '<span data-unit-converter-currency-amount="%s" data-unit-converter-currency-symbol="%s" data-unit-converter-currency-code="%s">%s</span>',
+                    esc_attr( $extracted_amount['amount'] ),
+                    esc_attr( $extracted_amount['symbol'] ),
+                    esc_attr( $extracted_amount['code'] ),
+                    $amount_text
+                );
+
+                $currency_amounts[ $amount_text ] = $formatted_text;
             } catch ( AUCP_Exception $e ) {
                 continue;
             }
         }
 
-        var_dump( $extracted_amounts );
-
-        return $content;
+        return $currency_amounts;
     }
 }
 
