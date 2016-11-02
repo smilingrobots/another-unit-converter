@@ -51,7 +51,7 @@ class Another_Unit_Converter_Plugin {
         $regexp = '/(*UTF8)([A-Z]{0,4}[^\w\d\s]?)(\d{4,}|\d{1,3}(?:[,.]\d{1,3})*)/u';
 
         if ( ! preg_match_all( $regexp, strip_tags( $content ), $matches, PREG_OFFSET_CAPTURE ) ) {
-            return $content;
+            return $currency_amounts;
         }
 
         foreach ( $matches[0] as $index => $match ) {
