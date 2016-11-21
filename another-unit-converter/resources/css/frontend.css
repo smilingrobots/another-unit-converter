@@ -1,0 +1,50 @@
+.another-unit-converter-currency-switcher {
+    background: #F4F4F4;
+    border: 1px solid #EEE;
+    border-radius: 2px;
+    display: inline-block;
+    padding: 0 2px;
+    position: relative;
+}
+
+.another-unit-converter-currency-switcher-button {
+    background: blue;
+    border-radius: 10px;
+    display: inline-block;
+    height: 15px;
+    width: 15px;
+}
+
+.another-unit-converter-currency-switcher-widget {
+    background: #F4F4F4;
+    border: 1px solid #EEE;
+    border-radius: 2px;
+    left: -65px;
+    padding: 10px;
+    position: absolute;
+    text-align: center;
+    top: 34px;
+    width: 250px;
+    z-index: 10000;
+}
+.another-unit-converter-currency-switcher-widget ul {
+    height: 116px;
+    margin: 0;
+    overflow-y: scroll;
+}
+.another-unit-converter-currency-switcher-widget li {
+    border-bottom: 1px solid #EEE;
+}
+.another-unit-converter-currency-switcher-widget li a {
+    text-decoration: none;
+    box-shadow: none;
+}
+.another-unit-converter-currency-switcher-widget-symbol {
+    color: #BBB;
+}
+.another-unit-converter-currency-switcher-widget-name {
+    margin: 0 4px;
+}
+.another-unit-converter-currency-switcher-widget-code {
+    color: #BBB;
+}

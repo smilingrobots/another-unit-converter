@@ -25,10 +25,42 @@ class Another_Unit_Converter_Plugin {
 
     public function plugins_loaded() {
         add_action( 'init', array( $this, 'init' ) );
+        add_action( 'template_redirect', array( $this, 'frontend_init' ) );
     }
 
     public function init() {
         add_filter( 'the_content', array( $this, 'format_currency_amounts' ) );
+    }
+
+    public function frontend_init() {
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_scripts_and_styles' ) );
+
+        wp_register_script(
+            'another-unit-converter-vue',
+            plugin_dir_url( __FILE__ ) . 'resources/js/vue/vue.js',
+            array(),
+            '2.0.3',
+            true
+        );
+
+        wp_register_script(
+            'another-unit-converter-frontend',
+            plugin_dir_url( __FILE__ ) . 'resources/js/frontend.js',
+            array( 'another-unit-converter-vue', 'jquery' ),
+            false,
+            true
+        );
+
+        wp_register_style(
+            'another-unit-converter-frontend',
+            plugin_dir_url( __FILE__ ) . 'resources/css/frontend.css',
+            array(),
+            false
+        );
+    }
+
+    public function enqueue_frontend_scripts_and_styles() {
+        wp_enqueue_style( 'another-unit-converter-frontend' );
     }
 
     public function format_currency_amounts( $content ) {
@@ -37,6 +69,8 @@ class Another_Unit_Converter_Plugin {
         if ( ! $currency_amounts ) {
             return $content;
         }
+
+        wp_enqueue_script( 'another-unit-converter-frontend' );
 
         foreach ( $currency_amounts as $amount_text => $formatted_text ) {
             $content = str_replace( $amount_text, $formatted_text, $content );
@@ -72,7 +106,7 @@ class Another_Unit_Converter_Plugin {
                 }
 
                 $formatted_text = sprintf(
-                    '<span data-unit-converter-currency-amount="%s" data-unit-converter-currency-symbol="%s" data-unit-converter-currency-code="%s">%s</span>',
+                    '<currency-switcher data-unit-converter-currency-amount="%1$s" data-unit-converter-currency-symbol="%2$s" data-unit-converter-currency-code="%3$s" amount="%1$s" symbol="%2$s" code="%3$s" text="%4$s">%4$s</currency-switcher>',
                     esc_attr( $extracted_amount['amount'] ),
                     esc_attr( $extracted_amount['symbol'] ),
                     esc_attr( $extracted_amount['code'] ),
