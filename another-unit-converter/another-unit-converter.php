@@ -82,7 +82,7 @@ class Another_Unit_Converter_Plugin {
     private function find_currency_amounts( $content ) {
         $currency_amounts = array();
 
-        $regexp = '/(*UTF8)([A-Z]{0,4}[^\w\d\s]?)(\d{4,}|\d{1,3}(?:[,.]\d{1,3})*)/u';
+        $regexp = '/(*UTF8)([A-Z]{0,4}[^\w\d\s]?)[\s]{0,1}(\d{4,}|\d{1,3}(?:[,.]\d{1,3})*)[\s]{0,1}([A-Z]{0,4}[^\w\d\s]?)/u';
 
         if ( ! preg_match_all( $regexp, strip_tags( $content ), $matches, PREG_OFFSET_CAPTURE ) ) {
             return $currency_amounts;
@@ -93,7 +93,13 @@ class Another_Unit_Converter_Plugin {
             $amount_symbol = $matches[1][ $index ][0];
             $amount_number = $matches[2][ $index ][0];
 
+            if ( ! $amount_symbol )
+                $amount_symbol = $matches[3][ $index ][0];
+
             try {
+                // TODO: maybe we should just "pass" everything to the parser. The extra context (for instance in the case
+                // of USD $5) could be useful to disambiguate the currency code. And also, it seems we're actually 
+                // parsing here instead of inside the parser :P -j
                 $extracted_amount = $this->currency_parser->parse_amount(
                     $amount_text,
                     $amount_symbol,
