@@ -89,7 +89,7 @@ class Another_Unit_Converter_Plugin {
         }
 
         foreach ( $matches[0] as $index => $match ) {
-            $amount_text = $match[0];
+            $amount_text = trim( $match[0] );
             $amount_symbol = $matches[1][ $index ][0];
             $amount_number = $matches[2][ $index ][0];
 
