@@ -61,7 +61,7 @@ if ( typeof jQuery !== 'undefined' && typeof Vue !== 'undefined' ) {
 
         $(function() {
             new Vue({
-              el: '#post-8',
+              el: 'article',
               data: {
                 message: 'Hello Vue.js!'
               }
