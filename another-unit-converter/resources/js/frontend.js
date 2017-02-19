@@ -60,13 +60,14 @@ if ( typeof jQuery !== 'undefined' && typeof Vue !== 'undefined' ) {
         } );
 
         $(function() {
-            new Vue({
-              el: 'article',
-              data: {
-                message: 'Hello Vue.js!'
-              }
+            $('.post').each(function() {
+                new Vue({
+                  el: this,
+                  data: {
+                    message: 'Hello Vue.js!'
+                  }
+                });
             });
-            // $( '.another-unit-converter-currency' ).each(function(){});
         });
     })(jQuery);
 }
