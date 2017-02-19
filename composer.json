@@ -2,6 +2,10 @@
     "config": {
         "vendor-dir": "another-unit-converter/vendor"
     },
+    "require-dev": {
+        "phake/phake": "2.*",
+        "phpunit/phpunit": "5.*"
+    },
     "autoload": {
         "classmap": ["another-unit-converter/"]
     }
