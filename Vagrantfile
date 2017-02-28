@@ -29,5 +29,6 @@ Vagrant.configure(2) do |config|
 
   config.vm.synced_folder ".site/", "/srv/www/", :mount_options => [ "dmode=777", "fmode=666" ]
   config.vm.provision "shell", path: "scripts/vagrant-provision.sh"
-
+  config.vm.provision "shell", inline: "sudo systemctl restart network.service" # Workaround https://github.com/mitchellh/vagrant/issues/8115
 end
+
