@@ -23,12 +23,12 @@ class AUCP_Currency_Parser {
             $amount_text = $match[0];
 
             $prefix = mb_substr( $content_without_tags, max( 0, $offset - 9 ), min( $offset, 9 ) );
-            $prefix_parts = array_filter( explode( "\n", $prefix ) );
+            $prefix_parts = explode( "\n", $prefix );
             $closest_prefix = trim( preg_replace( '/\s+/', ' ', array_pop( $prefix_parts ) ) );
             $prefix_parts = array_reverse( explode( ' ', $closest_prefix ) );
 
             $suffix = mb_substr( $content_without_tags, $offset + strlen( $amount_text ), 9 );
-            $suffix_parts = array_filter( explode( "\n", $suffix ) );
+            $suffix_parts = explode( "\n", $suffix );
             $closest_suffix = trim( preg_replace( '/\s+/', ' ', array_shift( $suffix_parts ) ) );
             $suffix_parts = explode( ' ', $closest_suffix );
 
