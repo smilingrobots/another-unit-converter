@@ -11,7 +11,7 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Domain Path: /languages
  * Text Domain: another-unit-converter
-*/
+ */
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -72,68 +72,54 @@ class Another_Unit_Converter_Plugin {
     }
 
     public function format_currency_amounts( $content ) {
-        $currency_amounts = $this->find_currency_amounts( $content );
+        $currency_amounts = $this->currency_parser->get_currency_amounts( $content );
 
         if ( ! $currency_amounts ) {
             return $content;
         }
 
-        wp_enqueue_script( 'another-unit-converter-frontend' );
+        $replacement_amounts = array();
+        $replacement_amounts_count = 0;
 
-        foreach ( $currency_amounts as $amount_text => $formatted_text ) {
-            $content = str_replace( $amount_text, $formatted_text, $content );
-        }
+        foreach ( $currency_amounts as $index => $currency_amount ) {
+            $currency_info = $currency_amount['currencies'][0];
 
-        return $content;
-    }
-
-    private function find_currency_amounts( $content ) {
-        $currency_amounts = array();
-
-        $regexp = '/(*UTF8)([A-Z]{0,4}[^\w\d\s]?)[\s]{0,1}(\d{4,}|\d{1,3}(?:[,.]\d{1,3})*)[\s]{0,1}([A-Z]{0,4}[^\w\d\s]?)/u';
-
-        if ( ! preg_match_all( $regexp, strip_tags( $content ), $matches, PREG_OFFSET_CAPTURE ) ) {
-            return $currency_amounts;
-        }
-
-        foreach ( $matches[0] as $index => $match ) {
-            $amount_text = trim( $match[0] );
-            $amount_symbol = $matches[1][ $index ][0];
-            $amount_number = $matches[2][ $index ][0];
-
-            if ( ! $amount_symbol )
-                $amount_symbol = $matches[3][ $index ][0];
-
-            try {
-                // TODO: maybe we should just "pass" everything to the parser. The extra context (for instance in the case
-                // of USD $5) could be useful to disambiguate the currency code. And also, it seems we're actually 
-                // parsing here instead of inside the parser :P -j
-                $extracted_amount = $this->currency_parser->parse_amount(
-                    $amount_text,
-                    $amount_symbol,
-                    $amount_number
-                );
-
-                // TODO: Why the try-catch if we are returning null on failure?
-                if ( is_null( $extracted_amount ) ) {
-                    continue;
-                }
-
-                $formatted_text = sprintf(
-                    '<currency-switcher data-unit-converter-currency-amount="%1$s" data-unit-converter-currency-symbol="%2$s" data-unit-converter-currency-code="%3$s" amount="%1$s" symbol="%2$s" code="%3$s" text="%4$s">%4$s</currency-switcher>',
-                    esc_attr( $extracted_amount['amount'] ),
-                    esc_attr( $extracted_amount['symbol'] ),
-                    esc_attr( $extracted_amount['code'] ),
-                    $amount_text
-                );
-
-                $currency_amounts[ $amount_text ] = $formatted_text;
-            } catch ( AUCP_Exception $e ) {
+            if ( ! preg_match( $currency_info['pattern'], $content, $matches ) ) {
                 continue;
+            }
+
+            $amount_text = $matches[0];
+            $amount = esc_attr( $currency_info['amount'] );
+            $symbol = esc_attr( $currency_info['currency']['symbol'] );
+            $code = esc_attr( $currency_info['currency']['code'] );
+
+            $formatted_text = sprintf(
+                '<currency-switcher data-unit-converter-currency-amount="%1$s" data-unit-converter-currency-symbol="%2$s" data-unit-converter-currency-code="%3$s" amount="%1$s" symbol="%2$s" code="%3$s" text="%4$s">%5$s</currency-switcher>',
+                $amount,
+                $symbol,
+                $code,
+                '<amount-attribute-' . $replacement_amounts_count . '>',
+                '<amount-text-' . $replacement_amounts_count . '>'
+            );
+
+            $replacement_amounts[ $replacement_amounts_count ] = $amount_text;
+            $replacement_amounts_count = $replacement_amounts_count + 1;
+
+            // replace the first occurence of the amount text
+            if ( $replacement_pos = mb_strpos( $content, $amount_text ) ) {
+                // $content = substr_replace( $content, $formatted_text, $replacement_pos, mb_strlen( $amount_text ) );
+                $content = mb_substr( $content, 0, $replacement_pos ) . $formatted_text . mb_substr( $content, $replacement_pos + mb_strlen( $amount_text ) );
             }
         }
 
-        return $currency_amounts;
+        foreach ( $replacement_amounts as $index => $amount_text ) {
+            $content = str_replace( '<amount-attribute-' . $index . '>', esc_attr( $amount_text ), $content );
+            $content = str_replace( '<amount-text-' . $index . '>', esc_html( $amount_text ), $content );
+        }
+
+        wp_enqueue_script( 'another-unit-converter-frontend' );
+
+        return $content;
     }
 
     public function ajax_get_rates() {

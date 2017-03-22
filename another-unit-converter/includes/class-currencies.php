@@ -5,106 +5,126 @@ class AUCP_Currencies {
     private $currencies_codes_by_symbol = array(
         '؋' => 'AFN',
         'Lek' => 'ALL',
-        '$' => 'ARS',
-        'ƒ' => 'AWG',
-        '$' => 'AUD',
+        '$' => array(
+            'ARS',
+            'AUD',
+            'BSD',
+            'BBD',
+            'BMD',
+            'BND',
+            'CAD',
+            'KYD',
+            'CLP',
+            'COP',
+            'XCD',
+            'SVC',
+            'FJD',
+            'GYD',
+            'HKD',
+            'LRD',
+            'MXN',
+            'NAD',
+            'NZD',
+            'SGD',
+            'SBD',
+            'SRD',
+            'USD',
+        ),
+        'ƒ' => array(
+            'AWG',
+            'ANG',
+        ),
         'ман' => 'AZN',
-        '$' => 'BSD',
-        '$' => 'BBD',
         'Br' => 'BYN',
         'BZ$' => 'BZD',
-        '$' => 'BMD',
         '$b' => 'BOB',
         'KM' => 'BAM',
         'P' => 'BWP',
         'R$' => 'BRL',
-        '$' => 'BND',
-        'лв' => 'BGN',
+        'лв' => array(
+            'BGN',
+            'KZT',
+            'KGS',
+            'UZS',
+        ),
         '៛' => 'KHR',
-        '$' => 'CAD',
-        '$' => 'KYD',
-        '$' => 'CLP',
-        '¥' => 'CNY',
-        '$' => 'COP',
+        '¥' => array(
+            'CNY',
+            'JPY',
+        ),
         '₡' => 'CRC',
         'kn' => 'HRK',
-        '₱' => 'CUP',
+        '₱' => array(
+            'CUP',
+            'PHP',
+        ),
         'Kč' => 'CZK',
-        'kr' => 'DKK',
+        'kr' => array(
+            'DKK',
+            'ISK',
+            'NOK',
+            'SEK',
+        ),
         'RD$' => 'DOP',
-        '$' => 'XCD',
-        '£' => 'EGP',
-        '$' => 'SVC',
+        '£' => array(
+            'EGP',
+            'FKP',
+            'GIP',
+            'LBP',
+            'GBP',
+            'SHP',
+            'SYP',
+        ),
         '€' => 'EUR',
-        '£' => 'FKP',
-        '$' => 'FJD',
         '¢' => 'GHS',
-        '£' => 'GIP',
         'Q' => 'GTQ',
-        '$' => 'GYD',
         'L' => 'HNL',
-        '$' => 'HKD',
         'Ft' => 'HUF',
-        'kr' => 'ISK',
         'Rp' => 'IDR',
-        '﷼' => 'IRR',
+        '﷼' => array(
+            'IRR',
+            'QAR',
+            'OMR',
+            'SAR',
+            'YER',
+        ),
         'J$' => 'JMD',
-        '¥' => 'JPY',
-        'лв' => 'KZT',
-        'лв' => 'KGS',
         '₭' => 'LAK',
-        '£' => 'LBP',
-        '$' => 'LRD',
         'ден' => 'MKD',
         'RM' => 'MYR',
-        '₨' => 'MUR',
-        '$' => 'MXN',
+        '₨' => array(
+            'MUR',
+            'NPR',
+            'PKR',
+            'SCR',
+            'LKR',
+        ),
         '₮' => 'MNT',
         'MT' => 'MZN',
-        '$' => 'NAD',
-        '₨' => 'NPR',
-        'ƒ' => 'ANG',
         '₪' => 'ILS',
         'NT$' => 'TWD',
-        '$' => 'NZD',
         'C$' => 'NIO',
         '₦' => 'NGN',
-        '₩' => 'KPW',
-        'kr' => 'NOK',
-        '₨' => 'PKR',
+        '₩' => array(
+            'KPW',
+            'KRW',
+        ),
         'B/.' => 'PAB',
         'Gs' => 'PYG',
         'S/.' => 'PEN',
         '$U' => 'UYU',
-        '₱' => 'PHP',
         'zł' => 'PLN',
-        '£' => 'GBP',
-        '﷼' => 'QAR',
-        '﷼' => 'OMR',
         'lei' => 'RON',
         'руб' => 'RUB',
-        '£' => 'SHP',
-        '﷼' => 'SAR',
         'Дин.' => 'RSD',
-        '₨' => 'SCR',
-        '$' => 'SGD',
-        '$' => 'SBD',
         'S' => 'SOS',
         'R' => 'ZAR',
-        '₩' => 'KRW',
-        '₨' => 'LKR',
-        '$' => 'SRD',
-        'kr' => 'SEK',
         'CHF' => 'CHF',
-        '£' => 'SYP',
         '฿' => 'THB',
         'TT$' => 'TTD',
         '₴' => 'UAH',
-        '$' => 'USD',
-        'лв' => 'UZS',
         'Bs' => 'VEF',
         '₫' => 'VND',
-        '﷼' => 'YER',
         'Z$' => 'ZWD',
     );
 
@@ -1942,8 +1962,34 @@ class AUCP_Currencies {
         return isset( $array[ $key ] ) ? $array[ $key ] : $default;
     }
 
-    public function get_currency_code_from_symbol( $symbol ) {
-        return $this->get_default( $this->currencies_codes_by_symbol, $symbol );
+    public function find_currencies_by_symbol( $currency_symbol ) {
+        $currencies_codes = $this->find_currency_codes_by_symbol( $currency_symbol );
+
+        if ( is_null( $currencies_codes ) ) {
+            return array();
+        }
+
+        $currencies = array();
+
+        foreach ( $currencies_codes as $currency_code ) {
+            $currencies[] = $this->get_currency( $currency_code );
+        }
+
+        return $currencies;
+    }
+
+    public function find_currency_codes_by_symbol( $symbol ) {
+        return (array) $this->get_default( $this->currencies_codes_by_symbol, $symbol );
+    }
+
+    public function get_currency_from_country_code( $country_code ) {
+        $currency_code = $this->get_currency_code_from_country_code( $country_code );
+
+        if ( is_null( $currency_code ) ) {
+            return null;
+        }
+
+        return $this->get_currency( $currency_code );
     }
 
     public function get_currency_code_from_country_code( $country_code ) {
