@@ -9,7 +9,7 @@ if [ ! -f "/srv/state/yum-packages" ]; then
     yum -y install epel-release
     yum -y install nginx
     yum -y install mariadb-server mariadb
-    yum -y install php php-mysql php-fpm php-gd
+    yum -y install php php-mysql php-mbstring php-fpm php-gd
     yum -y install vim
 
     touch "/srv/state/yum-packages"
