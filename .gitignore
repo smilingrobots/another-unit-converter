@@ -1,4 +1,5 @@
 .DS_Store
 .site/
 .vagrant/
+node_modules/
 vendor/
