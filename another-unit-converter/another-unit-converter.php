@@ -18,15 +18,23 @@ require __DIR__ . '/vendor/autoload.php';
 class Another_Unit_Converter_Plugin {
 
     private $currency_parser;
+    private $currency_conversion;
+    private $resources;
 
-    public function __construct( $currency_parser, $currency_conversion ) {
+    public function __construct( $currency_parser, $currency_conversion, $resources ) {
         $this->currency_parser = $currency_parser;
         $this->currency_conversion = $currency_conversion;
+        $this->resources = $resources;
     }
 
     public function plugins_loaded() {
         add_action( 'init', array( $this, 'init' ) );
-        add_action( 'template_redirect', array( $this, 'frontend_init' ) );
+
+        add_action( 'wp_enqueue_scripts', array( $this->resources, 'register_scripts_and_styles' ) );
+
+        if ( ! defined( 'DOING_AJAX' ) && ! is_admin() ) {
+            $this->frontend_init();
+        }
 
         add_action( 'wp_ajax_aucp_get_rates', array( $this, 'ajax_get_rates' ) );
         add_action( 'wp_ajax_nopriv_aucp_get_rates', array( $this,'ajax_get_rates' ) );
@@ -41,30 +49,7 @@ class Another_Unit_Converter_Plugin {
     }
 
     public function frontend_init() {
-        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_scripts_and_styles' ) );
-
-        wp_register_script(
-            'another-unit-converter-vue',
-            plugin_dir_url( __FILE__ ) . 'resources/js/vue/vue.js',
-            array(),
-            '2.0.3',
-            true
-        );
-
-        wp_register_script(
-            'another-unit-converter-frontend',
-            plugin_dir_url( __FILE__ ) . 'resources/js/frontend.js',
-            array( 'another-unit-converter-vue', 'jquery' ),
-            false,
-            true
-        );
-
-        wp_register_style(
-            'another-unit-converter-frontend',
-            plugin_dir_url( __FILE__ ) . 'resources/css/frontend.css',
-            array(),
-            false
-        );
+        add_action( 'wp_enqueue_scripts', array( $this->resources, 'enqueue_frontend_scripts_and_styles' ) );
     }
 
     public function enqueue_frontend_scripts_and_styles() {
@@ -206,7 +191,8 @@ class Another_Unit_Converter_Plugin {
 function aucp_load_another_unit_converter_plugin() {
     $plugin = new Another_Unit_Converter_Plugin(
         new AUCP_Currency_Parser( new AUCP_Currencies() ),
-        new AUCP_Currency_Conversion()
+        new AUCP_Currency_Conversion(),
+        new AUCP_Resources( plugin_dir_url( __FILE__ ) )
     );
 
     $plugin->plugins_loaded();
