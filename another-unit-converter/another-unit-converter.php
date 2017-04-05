@@ -19,11 +19,13 @@ class Another_Unit_Converter_Plugin {
 
     private $currency_parser;
     private $currency_conversion;
+    private $currencies;
     private $resources;
 
-    public function __construct( $currency_parser, $currency_conversion, $resources ) {
+    public function __construct( $currency_parser, $currency_conversion, $currencies, $resources ) {
         $this->currency_parser = $currency_parser;
         $this->currency_conversion = $currency_conversion;
+        $this->currencies = $currencies;
         $this->resources = $resources;
     }
 
@@ -50,10 +52,14 @@ class Another_Unit_Converter_Plugin {
 
     public function frontend_init() {
         add_action( 'wp_enqueue_scripts', array( $this->resources, 'enqueue_frontend_scripts_and_styles' ) );
+        add_action( 'wp_footer', array( $this, 'maybe_print_currency_switcher_template' ) );
     }
 
-    public function enqueue_frontend_scripts_and_styles() {
-        wp_enqueue_style( 'another-unit-converter-frontend' );
+    public function maybe_print_currency_switcher_template() {
+        if ( $this->resources->are_frontend_scripts_enqueued() ) {
+            $currencies = $this->currencies->get_currencies();
+            include( __DIR__ . '/templates/currency-switcher.tpl.php' );
+        }
     }
 
     public function format_currency_amounts( $content ) {
@@ -189,9 +195,12 @@ class Another_Unit_Converter_Plugin {
 }
 
 function aucp_load_another_unit_converter_plugin() {
+    $currencies = new AUCP_Currencies();
+
     $plugin = new Another_Unit_Converter_Plugin(
-        new AUCP_Currency_Parser( new AUCP_Currencies() ),
+        new AUCP_Currency_Parser( $currencies ),
         new AUCP_Currency_Conversion(),
+        $currencies,
         new AUCP_Resources( plugin_dir_url( __FILE__ ) )
     );
 
