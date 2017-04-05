@@ -1954,6 +1954,10 @@ class AUCP_Currencies {
         ),
     );
 
+    public function get_currencies() {
+        return $this->currencies_by_code;
+    }
+
     public function get_currency( $currency_code ) {
         return $this->get_default( $this->currencies_by_code, $currency_code );
     }
