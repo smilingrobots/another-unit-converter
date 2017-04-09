@@ -17,16 +17,36 @@ require __DIR__ . '/vendor/autoload.php';
 
 class Another_Unit_Converter_Plugin {
 
+    private static $instance = null;
+
     private $currency_parser;
     private $currency_conversion;
     private $currencies;
+    public $currencies;
     private $resources;
+
+
+    public static function instance() {
+        if ( is_null( self::$instance ) ) {
+            $currencies = new AUCP_Currencies();
+
+            self::$instance = new self(
+                new AUCP_Currency_Parser( $currencies ),
+                new AUCP_Currency_Conversion(),
+                $currencies,
+                new AUCP_Resources( plugin_dir_url( __FILE__ ) )
+            );
+        }
+
+        return self::$instance;
+    }
 
     public function __construct( $currency_parser, $currency_conversion, $currencies, $resources ) {
         $this->currency_parser = $currency_parser;
         $this->currency_conversion = $currency_conversion;
         $this->currencies = $currencies;
         $this->resources = $resources;
+        add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ) );
     }
 
     public function plugins_loaded() {
@@ -194,16 +214,10 @@ class Another_Unit_Converter_Plugin {
     }
 }
 
-function aucp_load_another_unit_converter_plugin() {
-    $currencies = new AUCP_Currencies();
-
-    $plugin = new Another_Unit_Converter_Plugin(
-        new AUCP_Currency_Parser( $currencies ),
-        new AUCP_Currency_Conversion(),
-        $currencies,
-        new AUCP_Resources( plugin_dir_url( __FILE__ ) )
-    );
-
-    $plugin->plugins_loaded();
+function AUCP() {
+    return Another_Unit_Converter_Plugin::instance();
 }
-add_action( 'plugins_loaded', 'aucp_load_another_unit_converter_plugin' );
+
+// Get things going.
+AUCP();
+
