@@ -1,71 +1,77 @@
-var count = 0;
-
-if ( typeof jQuery !== 'undefined' && typeof Vue !== 'undefined' ) {
+if ( typeof jQuery !== 'undefined' ) {
     (function($) {
-        Vue.component( 'currency-switcher', {
-            props: ['text', 'amount', 'symbol', 'code'],
-            template: '' +
-            '<div class="another-unit-converter-currency-switcher">' +
-            '    <div class="another-unit-converter-currency-switcher-label">{{text}}<a class="another-unit-converter-currency-switcher-button" href="#" v-on:click.prevent="open = !open"></a></div>' +
-            '    <div class="another-unit-converter-currency-switcher-widget" v-if="open">' +
-            '        <div>Change Currency</div>' +
-            '        <ul>' +
-            '            <li v-for="currency in currencies"><a href="#" v-on:click.prevent="changeSelectedCurrency(currency)">' +
-                             '<span class="another-unit-converter-currency-switcher-widget-symbol">{{ currency.symbol }}</span>' +
-                             '<span class="another-unit-converter-currency-switcher-widget-name">{{ currency.name }}</span>' +
-                             '<span class="another-unit-converter-currency-switcher-widget-code">({{ currency.code }})</span>' +
-            '            </a></li>' +
-            '        </ul>' +
-            '        <div>Footer</div>' +
-            '    </div>' +
-            '</div>',
-            data: function() {
-                return {
-                    open: ++count == 1,
-                    currencies: [
-                        {
-                            'name': 'US Dollar',
-                            'symbol': '$',
-                            'code': 'USD'
-                        },{
-                            'name': 'Canadian Dollar',
-                            'symbol': '$',
-                            'code': 'CAD'
-                        },{
-                            'name': 'Australian Dollar',
-                            'symbol': '$',
-                            'code': 'AUD'
-                        },{
-                            'name': 'Euro',
-                            'symbol': '$',
-                            'code': 'EUR'
-                        },{
-                            'name': 'Japan Yuan',
-                            'symbol': '$',
-                            'code': 'JPY'
-                        },{
-                            'name': 'South Korea Wen',
-                            'symbol': '$',
-                            'code': 'KRW'
-                        }
-                    ]
-                }
-            },
-
-            methods: {
-                changeSelectedCurrency: function(currency) {
-                    console.log(currency.symbol, currency.name, currency.code);
-                }
-            }
-        } );
-
         $(function() {
-            $('.post').each(function() {
-                new Vue({
-                  el: this,
-                  data: {
-                    message: 'Hello Vue.js!'
-                  }
+            var $widget = $( $('#aucp-currency-switcher-template').html() );
+
+            $widget.appendTo( $('body') ).dialog({
+                autoOpen: false,
+                dialogClass: 'aucp-currency-switcher-container',
+                minHeight: 80
+            });
+
+            var ENTER = 13,
+                SPACE = 32,
+                UP = 38,
+                DOWN = 40,
+                RIGHT = 39,
+                LEFT = 37;
+
+            $widget.on('keyup.aucp', 'input', function(e) {
+                switch ( e.keyCode ) {
+                    case ENTER:
+                    case SPACE:
+                        break;
+                    case UP:
+                        break;
+                    case DOWN:
+                        break;
+                    default:
+                        var search = $(this).val().toLowerCase();
+                        var $allCurrencies = $widget.find('[data-content]').show();
+
+                        if ( search.length ) {
+                            $allCurrencies.not('[data-content*="' + search + '"]').hide();
+                        }
+                }
+            });
+
+            $widget.on('click', 'ul li', function(e) {
+                var target = $(this).attr('data-code');
+                var sources = $('[data-unit-converter-currency-code]');
+                var codes = sources.map(function() {
+                    return $(this).attr('data-unit-converter-currency-code');
+                }).get();
+
+                $.getJSON($widget.attr('data-ajax-url'), {
+                    action: 'aucp_get_rates',
+                    codes: $.unique(codes.concat(['USD', target]))
+                }).done(function(data) {
+                    sources.each(function() {
+                        var $currencyAmount = $(this),
+                            amount = $currencyAmount.attr('data-unit-converter-currency-amount'),
+                            code = $currencyAmount.attr('data-unit-converter-currency-code'),
+                            symbol = $currencyAmount.attr('data-unit-converter-currency-symbol'),
+                            fromRate = data.rates[code],
+                            toRate = data.rates[target],
+                            newAmount = toRate * (parseFloat(amount) / fromRate),
+                            // http://www.jacklmoore.com/notes/rounding-in-javascript/
+                            roundedAmount = Number(Math.round(newAmount+'e2')+'e-2');
+
+                        $currencyAmount.html(roundedAmount + ' ' + target);
+                    })
+                });
+
+                $widget.dialog('close');
+            });
+
+            $search = $widget.find('input');
+
+            $('.aucp-currency-amount').each(function() {
+                $(this).click(function() {
+                    $search.val('').trigger('keyup.aucp').focus();
+
+                    $widget.dialog('option', 'position', { my: 'center top+10', at: 'bottom', of: $(this) });
+                    $widget.dialog('open');
                 });
             });
         });
