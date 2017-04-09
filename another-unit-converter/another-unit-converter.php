@@ -23,6 +23,7 @@ class Another_Unit_Converter_Plugin {
     private $currency_conversion;
     public $currencies;
     public $settings;
+    private $admin;
     private $resources;
 
 
@@ -59,6 +60,10 @@ class Another_Unit_Converter_Plugin {
 
         if ( ! defined( 'DOING_AJAX' ) && ! is_admin() ) {
             $this->frontend_init();
+        }
+
+        if ( is_admin() ) {
+            $this->admin = new AUCP_Admin();
         }
 
         add_action( 'wp_ajax_aucp_get_rates', array( $this, 'ajax_get_rates' ) );
