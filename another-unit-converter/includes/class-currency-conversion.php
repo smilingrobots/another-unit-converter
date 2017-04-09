@@ -59,7 +59,8 @@ class AUCP_Currency_Conversion {
         $exchange_rates = get_transient( 'aucp-exchange-rates' );
 
         if ( ! $exchange_rates ) {
-            $api_key = '43ca3a44571f036369d23300c635617f'; // Hardcoded for now.
+            // FIXME: API key is hardcoded for testing purposes (for now). Remove before release.
+            $api_key = AUCP()->settings->get_option( 'currencylayer_key', '43ca3a44571f036369d23300c635617f' );
             $request = wp_remote_get( 'http://apilayer.net/api/live?access_key=' . $api_key . '&source=USD' );
 
             if ( is_wp_error( $request ) )

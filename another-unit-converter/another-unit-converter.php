@@ -21,7 +21,6 @@ class Another_Unit_Converter_Plugin {
 
     private $currency_parser;
     private $currency_conversion;
-    private $currencies;
     public $currencies;
     public $settings;
     private $resources;
