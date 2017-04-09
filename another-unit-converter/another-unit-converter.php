@@ -23,6 +23,7 @@ class Another_Unit_Converter_Plugin {
     private $currency_conversion;
     private $currencies;
     public $currencies;
+    public $settings;
     private $resources;
 
 
@@ -46,6 +47,9 @@ class Another_Unit_Converter_Plugin {
         $this->currency_conversion = $currency_conversion;
         $this->currencies = $currencies;
         $this->resources = $resources;
+
+        $this->settings = new AUCP_Settings();
+
         add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ) );
     }
 
@@ -67,6 +71,10 @@ class Another_Unit_Converter_Plugin {
     }
 
     public function init() {
+        if ( ! $this->settings->get_option( 'enabled', false ) ) {
+            return;
+        }
+
         add_filter( 'the_content', array( $this, 'format_currency_amounts' ) );
     }
 
