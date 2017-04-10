@@ -6,6 +6,7 @@ class AUCP_Currencies {
         '؋' => 'AFN',
         'Lek' => 'ALL',
         '$' => array(
+            'USD',
             'ARS',
             'AUD',
             'BSD',
@@ -28,7 +29,6 @@ class AUCP_Currencies {
             'SGD',
             'SBD',
             'SRD',
-            'USD',
         ),
         'ƒ' => array(
             'AWG',
@@ -67,11 +67,11 @@ class AUCP_Currencies {
         ),
         'RD$' => 'DOP',
         '£' => array(
+            'GBP',
             'EGP',
             'FKP',
             'GIP',
             'LBP',
-            'GBP',
             'SHP',
             'SYP',
         ),
