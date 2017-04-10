@@ -83,11 +83,15 @@ if ( typeof jQuery !== 'undefined' ) {
                             // http://www.jacklmoore.com/notes/rounding-in-javascript/
                             roundedAmount = Number(Math.round(newAmount+'e2')+'e-2');
 
+                        if ( code == target ) {
+                            return;
+                        }
+
                         
                         var template = data.rates[target].format_template;
                         var formattedNumber = aucp_number_format( roundedAmount, data.rates[target].decimal_places, data.rates[target].decimal_point, data.rates[target].thousands_separator );
 
-                        $currencyAmount.find( '.aucp-converted-text' ).html( template.replace( '<amount>', formattedNumber ) );
+                        $currencyAmount.find( '.aucp-converted-text' ).html( template.replace( '<amount>', formattedNumber ) ).attr( 'title', data.rates[target].name );
                         $currencyAmount.addClass( 'aucp-converted' );
                     })
                 });
