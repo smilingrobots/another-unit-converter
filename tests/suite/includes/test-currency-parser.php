@@ -120,7 +120,7 @@ class AUCP_Test_Currency_Parser extends AUCP_Test_Case {
         $this->assertNotEmpty( $currency_amounts , "Currency Parser returned an empty array for: $amount_text." );
         $this->assertEquals( 1, count( $currency_amounts ), "Currency parser returned more than a currency amount for: $amount_text" );
 
-        $currency = $currency_amounts[0]['currencies'][0]['currency'];
+        $currency = reset( $currency_amounts[0]['currencies'] )['currency'];
 
         $this->assertEquals( $currency_code, $currency['code'], "Currency code doesn't match for: $amount_text." );
         $this->assertEquals( $currency_symbol, $currency['symbol'], "Currency symbol doesn't match for: $amount_text." );
@@ -185,8 +185,9 @@ class AUCP_Test_Currency_Parser extends AUCP_Test_Case {
 
         $this->check_it_detects_a_single_currency( $text, 'AUD', '$', 1000 );
 
-        $start_postion = $currency_amounts[0]['currencies'][0]['position']['start'];
-        $end_postion = $currency_amounts[0]['currencies'][0]['position']['end'];
+        $position = reset( $currency_amounts[0]['currencies'] )['position'];
+        $start_postion = $position['start'];
+        $end_postion = $position['end'];
 
         $this->assertEquals( 'AU$1,000', mb_substr( $text, $start_postion, $end_postion - $start_postion ) );
     }

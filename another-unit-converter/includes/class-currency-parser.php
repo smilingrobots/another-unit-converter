@@ -215,7 +215,7 @@ class AUCP_Currency_Parser {
         $prepared_currencies = array();
 
         foreach ( $currencies['currencies'] as $i => $currency ) {
-            $prepared_currencies[] = array(
+            $prepared_currencies[ $currency['code'] ] = array(
                 'currency' => $currency,
                 'position' => array( 'start' => $start_position, 'end' => $end_position ),
                 'amount' => $this->parse_amount( $amount_text, $currency ),

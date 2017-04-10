@@ -8,3 +8,5 @@ require getenv( 'WP_TESTS_DIR' ) . '/includes/functions.php';
 require getenv( 'WP_TESTS_DIR' ) . '/includes/bootstrap.php';
 
 require __DIR__ . '/includes/class-aucp-test-case.php';
+
+require dirname(__DIR__) . '/another-unit-converter/another-unit-converter.php';
