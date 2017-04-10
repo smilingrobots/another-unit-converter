@@ -3,10 +3,24 @@ if ( typeof jQuery !== 'undefined' ) {
         $(function() {
             var $widget = $( $('#aucp-currency-switcher-template').html() );
 
+            $( 'body' ).click(function(e) {
+                if ( ! $widget.dialog( 'isOpen' ) ) {
+                    return;
+                }
+
+                var $target = $( e.target );
+
+                if ( $target.closest( '.aucp-currency-amount, .ui-dialog' ).length > 0 ) {
+                    return;
+                }
+
+                $widget.dialog( 'close' );
+            });
+
             $widget.appendTo( $('body') ).dialog({
                 autoOpen: false,
                 dialogClass: 'aucp-currency-switcher-container',
-                minHeight: 80
+                minHeight: 80,
             });
 
             var ENTER = 13,
