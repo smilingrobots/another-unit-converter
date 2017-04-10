@@ -87,6 +87,17 @@ class AUCP_Settings {
             'options'     => array_combine( $currencies, $currencies )
         );
 
+        // FIXME: this setting name sucks.
+        $settings['amount_display'] = array(
+            'name' => _x( 'Conversion display (after choosing a currency)', 'settings', 'another-unit-converter' ),
+            'description' => '',
+            'type' => 'select',
+            'options' => array(
+                'both' => _x( 'Display original and converted amounts', 'settings', 'another-unit-converter' ),
+                'converted' => _x( 'Display only the converted amount', 'settings', 'another-unit-converter' )
+            )
+        );
+
         return apply_filters( 'aucp_registered_settings', $settings );
     }
 

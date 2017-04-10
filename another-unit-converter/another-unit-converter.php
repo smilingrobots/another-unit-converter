@@ -115,13 +115,20 @@ class Another_Unit_Converter_Plugin {
             $symbol = esc_attr( $currency_info['currency']['symbol'] );
             $code = esc_attr( $currency_info['currency']['code'] );
 
+            $html  = '';
+            $html .= '<span class="aucp-currency-amount" data-unit-converter-currency-amount="%1$s" data-unit-converter-currency-symbol="%2$s" data-unit-converter-currency-code="%3$s">';
+            $html .= '<span class="aucp-converted-text">%5$s</span>';
+            $html .= '<span class="aucp-original-text ' . ( 'converted' == AUCP()->settings->get_option( 'amount_display', 'both' ) ? 'aucp-keep-hidden' : '' ) . '" title="%6$s">%5$s</span>';
+            $html .= '</span>';
+
             $formatted_text = sprintf(
-                '<span class="aucp-currency-amount" data-unit-converter-currency-amount="%1$s" data-unit-converter-currency-symbol="%2$s" data-unit-converter-currency-code="%3$s"><span class="aucp-converted-text">%5$s</span><span class="aucp-original-text">%5$s</span></span>',
+                $html,
                 $amount,
                 $symbol,
                 $code,
                 esc_attr( $amount_text ),
-                esc_html( $amount_text )
+                esc_html( $amount_text ),
+                esc_attr( $currency_info['currency']['name'] )
             );
 
             $content = mb_substr( $content, 0, $start_position ) . $formatted_text . mb_substr( $content, $end_position );
