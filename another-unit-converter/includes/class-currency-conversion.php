@@ -3,11 +3,6 @@ class AUCP_Currency_Conversion {
 
     private $data = array( 'timestamp' => 0, 'rates' => array() );
 
-
-    public function __construct() {
-        $this->maybe_refresh_rates();
-    }
-
     /**
      * Returns USD -> currency quotes for all supported currencies.
      * @return array Array of currency conversion factors (from USD) with currency code as key.
@@ -81,7 +76,7 @@ class AUCP_Currency_Conversion {
         return ( 1.0 / $from_rate ) * $to_rate * floatval( $amount );
     }
 
-    private function maybe_refresh_rates() {
+    public function maybe_refresh_rates() {
         $exchange_rates = get_transient( 'aucp-exchange-rates' );
 
         if ( ! $exchange_rates ) {

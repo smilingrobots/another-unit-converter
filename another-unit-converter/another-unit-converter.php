@@ -81,6 +81,8 @@ class Another_Unit_Converter_Plugin {
             return;
         }
 
+        $this->currency_conversion->maybe_refresh_rates();
+
         add_filter( 'the_content', array( $this, 'format_currency_amounts' ) );
     }
 
@@ -267,4 +269,3 @@ function AUCP() {
 
 // Get things going.
 AUCP();
-
