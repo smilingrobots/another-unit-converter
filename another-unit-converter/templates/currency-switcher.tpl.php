@@ -1,5 +1,5 @@
 <script id="aucp-currency-switcher-template" type="template">
-<div class="aucp-currency-switcher" data-ajax-url="<?php echo admin_url( 'admin-ajax.php' ); ?>">
+<div class="aucp-currency-switcher">
     <div class="aucp-currency-switcher-title"><?php _e( 'Choose currency', 'another-unit-converter' ); ?></div>
     <div class="aucp-currency-switcher-separator"></div>
     <div class="aucp-currency-switcher-search-field-container">

@@ -23,6 +23,14 @@ class AUCP_Resources {
             array(),
             false
         );
+
+        wp_localize_script(
+            'another-unit-converter-frontend',
+            'aucp_js',
+            array( 
+                'ajaxurl' => admin_url( 'admin-ajax.php' ),
+            )
+        );
     }
 
     public function enqueue_frontend_scripts_and_styles() {
