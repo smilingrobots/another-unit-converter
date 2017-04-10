@@ -3,7 +3,7 @@
     <div class="aucp-currency-switcher-title"><?php _e( 'Choose currency', 'another-unit-converter' ); ?></div>
     <div class="aucp-currency-switcher-separator"></div>
     <div class="aucp-currency-switcher-search-field-container">
-        <input class="aucp-currency-switcher-search-field" type="text">
+        <input class="aucp-currency-switcher-search-field" type="text" placeholder="<?php esc_attr_e( 'Currency code or name', 'another-unit-converter' ); ?>" />
     </div>
     <ul class="aucp-currency-switcher-currencies-list">
         <?php foreach ( $currencies as $currency ): ?>
