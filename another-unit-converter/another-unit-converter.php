@@ -35,6 +35,7 @@ class Another_Unit_Converter_Plugin {
                 new AUCP_Currency_Parser( $currencies ),
                 new AUCP_Currency_Conversion(),
                 $currencies,
+                new AUCP_Settings(),
                 new AUCP_Resources( plugin_dir_url( __FILE__ ) )
             );
         }
@@ -42,13 +43,12 @@ class Another_Unit_Converter_Plugin {
         return self::$instance;
     }
 
-    public function __construct( $currency_parser, $currency_conversion, $currencies, $resources ) {
+    public function __construct( $currency_parser, $currency_conversion, $currencies, $settings, $resources ) {
         $this->currency_parser = $currency_parser;
         $this->currency_conversion = $currency_conversion;
         $this->currencies = $currencies;
+        $this->settings = $settings;
         $this->resources = $resources;
-
-        $this->settings = new AUCP_Settings();
 
         add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ) );
     }
@@ -108,7 +108,7 @@ class Another_Unit_Converter_Plugin {
         $offset = 0;
 
         foreach ( $currency_amounts as $index => $currency_amount ) {
-            $currency_info = $currency_amount['currencies'][0];
+            $currency_info = $this->select_currency( $currency_amount['currencies'] );
 
             $start_position = $currency_info['position']['start'] + $offset;
             $end_position = $currency_info['position']['end'] + $offset;
@@ -142,6 +142,16 @@ class Another_Unit_Converter_Plugin {
         wp_enqueue_script( 'another-unit-converter-frontend' );
 
         return $content;
+    }
+
+    private function select_currency( $currencies ) {
+        $default_currency = $this->settings->get_option( 'default_currency' );
+
+        if ( $default_currency && isset( $currencies[ $default_currency ] ) ) {
+            return $currencies[ $default_currency ];
+        }
+
+        return reset( $currencies );
     }
 
     public function ajax_get_rates() {
