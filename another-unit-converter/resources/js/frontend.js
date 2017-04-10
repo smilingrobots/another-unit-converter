@@ -103,6 +103,8 @@ if ( typeof jQuery !== 'undefined' ) {
             $widget.on('click', 'ul li', function(e) {
                 var target = $(this).attr('data-code');
 
+                // Save last currency selection.
+                $.post( aucp_js.ajaxurl, { action: 'aucp_remember_currency', code: target } );
 
                 // Convert.
                 aucp_convert_amounts( target );
@@ -120,6 +122,11 @@ if ( typeof jQuery !== 'undefined' ) {
                     $widget.dialog('open');
                 });
             });
+
+            // If there's a default target currency, perform conversion.
+            if ( aucp_js.default_target_currency ) {
+                aucp_convert_amounts( aucp_js.default_target_currency );
+            }
         });
     })(jQuery);
 }

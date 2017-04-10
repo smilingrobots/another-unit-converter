@@ -72,6 +72,8 @@ class Another_Unit_Converter_Plugin {
         add_action( 'wp_ajax_nopriv_aucp_convert', array( $this,'ajax_convert' ) );
         add_action( 'wp_ajax_aucp_batch_convert', array( $this, 'ajax_batch_convert' ) );
         add_action( 'wp_ajax_nopriv_aucp_batch_convert', array( $this,'ajax_batch_convert' ) );
+        add_action( 'wp_ajax_aucp_remember_currency', array( $this, 'ajax_remember_currency' ) );
+        add_action( 'wp_ajax_nopriv_aucp_remember_currency', array( $this,'ajax_remember_currency' ) );
     }
 
     public function init() {
@@ -218,6 +220,43 @@ class Another_Unit_Converter_Plugin {
         }
 
         echo json_encode( $response );
+        exit;
+    }
+
+    public function get_default_target_currency() {
+        $default_currency = ! empty( $_COOKIE['aucp_target_currency'] ) ? $_COOKIE['aucp_target_currency'] : '';
+        $default_currency = strtoupper( $default_currency );
+
+        if ( ! $default_currency ) {
+            return '';
+        }
+
+        $currency = $this->currencies->get_currency( $default_currency );
+
+        if ( ! $currency ) {
+            return '';
+        }
+
+        return $default_currency;
+    }
+
+    /**
+     * Stores the latest currency code selection on a cookie for future reference.
+     */
+    public function ajax_remember_currency() {
+        $code = ! empty( $_POST['code'] ) ? $_POST['code'] : '';
+
+        if ( ! $code ) {
+            exit;
+        }
+
+        $currency = $this->currencies->get_currency( $code );
+
+        if ( ! $currency ) {
+            exit;
+        }
+
+        @setcookie( 'aucp_target_currency', $code, 30 * DAYS_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
         exit;
     }
 }
