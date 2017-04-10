@@ -145,14 +145,15 @@ class Another_Unit_Converter_Plugin {
             }
         }
         $codes = array_map( 'strtoupper', $codes );
-        $all_rates = $this->currency_conversion->get_rates();
+        $all_rates = $this->currency_conversion->get_rates_with_currency_info();
 
         $response['success'] = true;
 
-        if ( ! $codes )
+        if ( ! $codes ) {
             $response['rates'] = $all_rates;
-        else
+        } else {
             $response['rates'] = wp_array_slice_assoc( $all_rates, $codes );
+        }
 
         echo json_encode( $response );
         exit;

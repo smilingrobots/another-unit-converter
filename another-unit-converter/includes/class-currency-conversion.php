@@ -17,6 +17,32 @@ class AUCP_Currency_Conversion {
     }
 
     /**
+     * Returns USD -> currency quotes along with currency information (decimal places, etc.).
+     * @return array Array of currency conversion factors (from USD) and currency code information.
+     */
+    public function get_rates_with_currency_info() {
+        $rates = $this->data['rates'];
+        $result = array();
+
+        foreach ( $rates as $currency_id => $factor ) {
+            $result[ $currency_id ] = array();
+            $result[ $currency_id ]['rate'] = $factor;
+
+            $currency = AUCP()->currencies->get_currency( $currency_id );
+            $result[ $currency_id ] = array_merge( $result[ $currency_id ], $currency );
+
+            // FIXME: this is harcoded (for now!)
+            $template  =  '';
+            $template .= ! empty( $currency['symbol'] ) ? $currency['symbol'] : $currency['code'];
+            $template .= ' ';
+            $template .= '<amount>';
+            $result[ $currency_id ]['format_template'] = $template;
+        }
+
+        return $result;
+    }
+
+    /**
      * Returns the timestamp of the last quotes update.
      * @return int
      */

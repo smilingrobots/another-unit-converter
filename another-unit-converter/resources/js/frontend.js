@@ -1,6 +1,18 @@
 if ( typeof jQuery !== 'undefined' ) {
     (function($) {
         $(function() {
+            /**
+             * Formats a number with grouped thosands.
+             * Taken from http://stackoverflow.com/a/14428340
+             */
+            var aucp_number_format = function( number, decimals, dec_point, thousands_sep ) {
+                var re = '\\d(?=(\\d{' + (3 || 3) + '})+' + (decimals > 0 ? '\\D' : '$') + ')',
+                    num = number.toFixed(Math.max(0, ~~decimals));
+
+                return (decimals ? num.replace('.', dec_point) : num).replace(new RegExp(re, 'g'), '$&' + (thousands_sep || ',')); 
+            };
+
+
             var $widget = $( $('#aucp-currency-switcher-template').html() );
 
             $( 'body' ).click(function(e) {
@@ -65,13 +77,17 @@ if ( typeof jQuery !== 'undefined' ) {
                             amount = $currencyAmount.attr('data-unit-converter-currency-amount'),
                             code = $currencyAmount.attr('data-unit-converter-currency-code'),
                             symbol = $currencyAmount.attr('data-unit-converter-currency-symbol'),
-                            fromRate = data.rates[code],
-                            toRate = data.rates[target],
+                            fromRate = data.rates[code].rate,
+                            toRate = data.rates[target].rate,
                             newAmount = toRate * (parseFloat(amount) / fromRate),
                             // http://www.jacklmoore.com/notes/rounding-in-javascript/
                             roundedAmount = Number(Math.round(newAmount+'e2')+'e-2');
 
-                        $currencyAmount.find( '.aucp-converted-text' ).html( roundedAmount + ' ' + target );
+                        
+                        var template = data.rates[target].format_template;
+                        var formattedNumber = aucp_number_format( roundedAmount, data.rates[target].decimal_places, data.rates[target].decimal_point, data.rates[target].thousands_separator );
+
+                        $currencyAmount.find( '.aucp-converted-text' ).html( template.replace( '<amount>', formattedNumber ) );
                         $currencyAmount.addClass( 'aucp-converted' );
                     })
                 });
