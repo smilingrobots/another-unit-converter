@@ -57,7 +57,8 @@ if ( typeof jQuery !== 'undefined' ) {
                             // http://www.jacklmoore.com/notes/rounding-in-javascript/
                             roundedAmount = Number(Math.round(newAmount+'e2')+'e-2');
 
-                        $currencyAmount.html(roundedAmount + ' ' + target);
+                        $currencyAmount.find( '.aucp-converted-text' ).html( roundedAmount + ' ' + target );
+                        $currencyAmount.addClass( 'aucp-converted' );
                     })
                 });
 

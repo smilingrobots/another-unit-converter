@@ -7,6 +7,29 @@
     .aucp-cursor-pointer;
     .aucp-display-inline-block;
     .aucp-padding-horizontal-xxxs;
+
+    .aucp-converted-text {
+        display: none;
+    }
+
+    &.aucp-converted {
+        .aucp-original-text {
+            color: #666;
+            margin: 0 0 0 0.5em;
+
+            &:before {
+                content: '(';
+            }
+            &:after {
+                content: ')';
+            }
+        }
+
+        .aucp-converted-text {
+            display: inline;
+        }
+    }
+
 }
 
 // aucp-display-inline-block

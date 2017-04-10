@@ -117,7 +117,7 @@ class Another_Unit_Converter_Plugin {
             $code = esc_attr( $currency_info['currency']['code'] );
 
             $formatted_text = sprintf(
-                '<span class="aucp-currency-amount" data-unit-converter-currency-amount="%1$s" data-unit-converter-currency-symbol="%2$s" data-unit-converter-currency-code="%3$s" data-unit-conveter-amount-text="%4$s">%5$s</span>',
+                '<span class="aucp-currency-amount" data-unit-converter-currency-amount="%1$s" data-unit-converter-currency-symbol="%2$s" data-unit-converter-currency-code="%3$s"><span class="aucp-converted-text">%5$s</span><span class="aucp-original-text">%5$s</span></span>',
                 $amount,
                 $symbol,
                 $code,
