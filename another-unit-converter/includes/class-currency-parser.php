@@ -9,64 +9,98 @@ class AUCP_Currency_Parser {
     }
 
     public function get_currency_amounts( $content ) {
-        $content_without_tags = strip_tags( $content );
         $regexp = '/(*UTF8)(?<currency_amount>\d{4,}|\d{1,3}(?:[,. ]\d{1,3})*)/';
 
-        if ( ! preg_match_all( $regexp, $content_without_tags, $matches, PREG_OFFSET_CAPTURE ) ) {
+        if ( ! preg_match_all( $regexp, $content, $matches, PREG_OFFSET_CAPTURE ) ) {
             return array();
         }
 
         $currency_amounts = array();
 
         foreach ( $matches['currency_amount'] as $match ) {
-            $offset = mb_strlen( mb_strcut( $content_without_tags, 0, $match[1] ) );
+            $offset = mb_strlen( mb_strcut( $content, 0, $match[1] ) );
             $amount_text = $match[0];
+            $amount_length = mb_strlen( $amount_text );
 
-            $prefix = mb_substr( $content_without_tags, max( 0, $offset - 9 ), min( $offset, 9 ) );
-            $prefix_parts = explode( "\n", $prefix );
-            $closest_prefix = trim( preg_replace( '/\s+/', ' ', array_pop( $prefix_parts ) ) );
-            $prefix_parts = array_reverse( explode( ' ', $closest_prefix ) );
+            $prefix_parts = $this->get_prefix_parts( $content, $offset );
+            $suffix_parts = $this->get_suffix_parts( $content, $offset, $amount_length );
+            $parts = array_merge( $prefix_parts, $suffix_parts );
 
-            $suffix = mb_substr( $content_without_tags, $offset + strlen( $amount_text ), 9 );
-            $suffix_parts = explode( "\n", $suffix );
-            $closest_suffix = trim( preg_replace( '/\s+/', ' ', array_shift( $suffix_parts ) ) );
-            $suffix_parts = explode( ' ', $closest_suffix );
+            $parts_to_check = array( array( 0, array( 2, 1 ) ), array( 2, array( 0, 3 ) ) );
+            $currencies = $this->get_currencies_from_parts( $parts, $parts_to_check );
 
-            $parts = array();
-            $max_number_of_parts = max( count( $prefix_parts ), count( $suffix_parts ) );
-
-            for ( $i = 0; $i < $max_number_of_parts; $i++ ) {
-                if ( isset( $prefix_parts[ $i ] ) ) {
-                    $parts[] = $prefix_parts[ $i ];
-                }
-
-                if ( isset( $suffix_parts[ $i ] ) ) {
-                    $parts[] = $suffix_parts[ $i ];
-                }
-            }
-
-            $currencies = $this->get_currencies_from_parts( $parts );
-
-            if ( ! $currencies ) {
+            if ( ! $currencies['currencies'] ) {
                 continue;
             }
 
             $currency_amounts[] = array(
                 'amount_text' => $amount_text,
-                'currencies' => $this->prepare_currencies( $amount_text, $currencies ),
+                'currencies' => $this->prepare_currencies( $amount_text, $offset, $amount_length, $currencies ),
             );
         }
 
         return $currency_amounts;
     }
 
-    private function get_currencies_from_parts( $parts, $part_index = 0 ) {
-        $currencies = array();
+    private function get_prefix_parts( $content, $offset ) {
+        $prefix = mb_substr( $content, max( 0, $offset - 9 ), min( $offset, 9 ) );
+        $prefix_parts = explode( "\n", $prefix );
+        $closest_prefix = array_pop( $prefix_parts );
+        $prefix_parts = mb_split( '[!"#%&\'()*+,-./:;<=>?@\[\]\^_`{|}~ ]', $closest_prefix );
+        $augmented_parts = array();
+        $accumulated_offset = 0;
 
-        $number_of_parts = count( $parts );
+        for ( $i = count( $prefix_parts ); $i > 0; $i = $i - 1 ) {
+            if ( $prefix_parts[ $i - 1 ] ) {
+                $part_length = mb_strlen( $prefix_parts[ $i - 1 ] );
+                $augmented_parts[] = array(
+                    'type' => 'prefix',
+                    'offset' => $offset - $part_length - $accumulated_offset,
+                    'length' => $part_length,
+                    'content' => $prefix_parts[ $i - 1 ],
+                );
+                $accumulated_offset = $accumulated_offset + $part_length;
+            }
 
-        for ( $i = $part_index; $i < $number_of_parts; $i = $i + 1 ) {
-            $part_without_punctuation = preg_replace( '/[\(\)\.:;,<=>\|!~\?_\-]/', '', $parts[ $i ] );
+            $accumulated_offset = $accumulated_offset + 1;
+        }
+
+        return array_pad( array_slice( $augmented_parts, 0, 2 ), 2, array() );
+    }
+
+    private function get_suffix_parts( $content, $offset, $amount_length ) {
+        $suffix = mb_substr( $content, $offset + $amount_length, 9 );
+        $suffix_parts = explode( "\n", $suffix );
+        $closest_suffix = array_shift( $suffix_parts );
+        $suffix_parts = mb_split( '[!"#%&\'()*+,-./:;<=>?@\[\]\^_`{|}~ ]', $closest_suffix );
+        $augmented_parts = array();
+        $accumulated_offset = 0;
+
+        for ( $i = 0; $i < count( $suffix_parts ); $i = $i + 1 ) {
+            if ( $suffix_parts[ $i ] ) {
+                $part_length = mb_strlen( $suffix_parts[ $i ] );
+                $augmented_parts[] = array(
+                    'type' => 'suffix',
+                    'offset' => $offset + $amount_length + $accumulated_offset,
+                    'length' => $part_length,
+                    'content' => $suffix_parts[ $i ],
+                );
+                $accumulated_offset = $accumulated_offset + $part_length;
+            }
+
+            $accumulated_offset = $accumulated_offset + 1;
+        }
+
+        return array_pad( array_slice( $augmented_parts, 0, 2 ), 2, array() );
+    }
+
+    private function get_currencies_from_parts( $parts, $selected_parts = array() ) {
+        foreach ( $selected_parts as $selected_part ) {
+            $selected_part = (array) $selected_part;
+
+            if ( ! $parts[ $selected_part[0] ] ) {
+                continue;
+            }
 
             /**
              * Capturing Groups:
@@ -85,7 +119,7 @@ class AUCP_Currency_Parser {
                 . '|' . '([^\s]{0,2}[^\d\s])([[:alpha:]]{2})'  // Matches $US
                 . '|' . '([^\s]{0,2}[^\d\s])'                  // Matches $
                 .   '/',
-                $part_without_punctuation,
+                $parts[ $selected_part[0] ]['content'],
                 $captured_values
             );
 
@@ -103,31 +137,47 @@ class AUCP_Currency_Parser {
                 $currency_symbol = $country_code;
             }
 
-            if ( $currency_code ) {
-                $currency = $this->currencies->get_currency( $currency_code );
-                $currencies = $currency ? array( $currency ) : array();
-            }
+            $alternatives = array(
+                'get_currency' => $currency_code,
+                'get_currency_from_country_code' => $country_code,
+                'find_currencies_by_symbol' => $currency_symbol,
+            );
 
-            if ( ! $currencies && $country_code ) {
-                $currency = $this->currencies->get_currency_from_country_code( $country_code );
-                $currencies = $currency ? array( $currency ) : array();
-            }
-
-            if ( ! $currencies && $currency_symbol ) {
-                $currencies = $this->currencies->find_currencies_by_symbol( $currency_symbol );
-
-                if ( count( $currencies ) > 1 ) {
-                    $suggested_currencies = $this->get_currencies_from_parts( $parts, $part_index + 1 );
-                    $currencies = $this->try_to_choose_currency( $currencies, $suggested_currencies );
+            foreach ( $alternatives as $method => $param ) {
+                if ( ! $param ) {
+                    continue;
                 }
-            }
 
-            if ( $currencies ) {
-                break;
+                $currencies = (array) $this->currencies->{$method}( $param );
+
+                // The methods return an array or null (casted into an empty array above).
+                // We need to know whether it is an indexed array of currencies or a
+                // currency represented as an associative array.
+                //
+                // TODO: represent currencies as objects (could be just stdClass instances).
+                if ( isset( $currencies['code'] ) ) {
+                    $currencies = array( $currencies );
+                }
+
+                if ( $currencies && 1 == count( $currencies ) ) {
+                    return array( 'parts' => array( $parts[ $selected_part[0] ] ), 'currencies' => $currencies );
+                } elseif ( $currencies && count( $currencies ) > 1 ) {
+                    if ( isset( $selected_part[1] ) && count( $selected_part[1] ) > 1 ) {
+                        $suggested_currencies = $this->get_currencies_from_parts( $parts, $selected_part[1] );
+                    } else {
+                        $suggested_currencies = array();
+                    }
+
+                    $currencies = $this->try_to_choose_currency( $currencies, $suggested_currencies );
+
+                    array_unshift( $currencies['parts'], $parts[ $selected_part[0] ] );
+
+                    return $currencies;
+                }
             }
         }
 
-        return $currencies;
+        return array( 'parts' => array(), 'currencies' => array() );
     }
 
     private function get_captured_values( $matches, $alternatives ) {
@@ -139,60 +189,40 @@ class AUCP_Currency_Parser {
     }
 
     private function try_to_choose_currency( $currencies, $suggested_currencies ) {
-        if ( 1 === count( $suggested_currencies ) ) {
+        if ( 1 === count( $suggested_currencies['currencies'] ) ) {
             foreach ( $currencies as $currency ) {
-                if ( $currency['code'] == $suggested_currencies[0]['code'] ) {
-                    return array( $suggested_currencies[0] );
+                if ( $currency['code'] == $suggested_currencies['currencies'][0]['code'] ) {
+                    return $suggested_currencies;
                 }
             }
         }
 
-        return $currencies;
+        return array( 'parts' => array(), 'currencies' => $currencies );
     }
 
-    private function prepare_currencies( $amount_text, $currencies ) {
+    private function prepare_currencies( $amount_text, $amount_offset, $amount_length, $currencies ) {
+        $start_position = $amount_offset;
+        $end_position = $start_position + $amount_length;
+
+        foreach ( $currencies['parts'] as $part ) {
+            if ( 'prefix' == $part['type'] ) {
+                $start_position = min( $part['offset'], $start_position );
+            } elseif ( 'suffix' == $part['type'] ) {
+                $end_position = max( $part['offset'] + $part['length'], $end_position );
+            }
+        }
+
         $prepared_currencies = array();
 
-        foreach ( $currencies as $i => $currency ) {
+        foreach ( $currencies['currencies'] as $i => $currency ) {
             $prepared_currencies[] = array(
                 'currency' => $currency,
-                'pattern' => $this->get_currency_pattern( $amount_text, $currency ),
+                'position' => array( 'start' => $start_position, 'end' => $end_position ),
                 'amount' => $this->parse_amount( $amount_text, $currency ),
             );
         }
 
         return $prepared_currencies;
-    }
-
-    private function get_currency_pattern( $amount_text, $currency ) {
-        $replacements = array(
-            '<currency-code>' => $currency['code'],
-            '<currency-symbol>' => '(?:' . preg_quote( $currency['symbol'] ) . ')',
-            // TODO: the first two characters of the code not always match the country code
-            '<country-code>' => substr( $currency['code'], 0, 2 ),
-            '<amount>' => preg_quote( $amount_text ),
-        );
-
-        $pattern_parts = array(
-            '<currency-code> *<currency-symbol>? *<amount>',
-            '<country-code> *<currency-symbol>? *<amount>',
-            '<currency-symbol> *<currency-code> *<amount>',
-            '<currency-symbol> *<country-code> *<amount>',
-            '<currency-symbol> *<amount> *<currency-code>',
-            '<amount> *<currency-code> *<currency-symbol>',
-            '<amount> *<country-code> *<currency-symbol>',
-            '<amount> *<currency-symbol> *<currency-code>',
-            '<amount> *<currency-symbol> *<country-code>',
-            '<currency-symbol> *<amount>',
-            '<amount> *<currency-code>',
-            '<amount> *<country-code>',
-            '<amount> *<currency-symbol>'
-        );
-
-        $pattern = implode( '|', $pattern_parts );
-        $pattern = str_replace( array_keys( $replacements ), array_values( $replacements ), $pattern );
-
-        return '/(*UTF8)' . $pattern . '/';
     }
 
     public function parse_amount( $amount_text, $currency ) {

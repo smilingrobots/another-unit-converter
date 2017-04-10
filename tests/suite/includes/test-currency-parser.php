@@ -93,15 +93,15 @@ class AUCP_Test_Currency_Parser extends AUCP_Test_Case {
         Phake::when( $this->currencies )->find_currencies_by_symbol( 'zł' )->thenReturn( array( $PLN ) );
     }
 
-    public function _test_get_currency_amounts() {
-        $this->check_it_detects_a_single_currency( 'USD $2500', 'USD', '$', 2500 );
+    public function test_get_currency_amounts() {
+        $this->check_it_detects_a_single_currency( '<li>USD $2500</li>', 'USD', '$', 2500 );
         $this->check_it_detects_a_single_currency( 'AU$800', 'AUD', '$', 800 );
         $this->check_it_detects_a_single_currency( 'ман130', 'AZN', 'ман', 130 );
         $this->check_it_detects_a_single_currency( 'US $1500', 'USD', '$', 1500 );
         $this->check_it_detects_a_single_currency( '$US 1500', 'USD', '$', 1500 );
         $this->check_it_detects_a_single_currency( '$USD 2500', 'USD', '$', 2500 );
         $this->check_it_detects_a_single_currency( '2500 USD', 'USD', '$', 2500 );
-        $this->check_it_detects_a_single_currency( '2500$ USD', 'USD', '$', 2500 );
+        $this->check_it_detects_a_single_currency( '<li>2500$ USD</li>', 'USD', '$', 2500 );
         $this->check_it_detects_a_single_currency( '2500 USD$', 'USD', '$', 2500 );
         $this->check_it_detects_a_single_currency( '2500 $USD', 'USD', '$', 2500 );
         $this->check_it_detects_a_single_currency( '$1350 AUD', 'AUD', '$', 1350 );
@@ -120,7 +120,7 @@ class AUCP_Test_Currency_Parser extends AUCP_Test_Case {
         $this->assertNotEmpty( $currency_amounts , "Currency Parser returned an empty array for: $amount_text." );
         $this->assertEquals( 1, count( $currency_amounts ), "Currency parser returned more than a currency amount for: $amount_text" );
 
-        $currency = $currency_amounts[0]['currencies'][0];
+        $currency = $currency_amounts[0]['currencies'][0]['currency'];
 
         $this->assertEquals( $currency_code, $currency['code'], "Currency code doesn't match for: $amount_text." );
         $this->assertEquals( $currency_symbol, $currency['symbol'], "Currency symbol doesn't match for: $amount_text." );
@@ -147,18 +147,47 @@ class AUCP_Test_Currency_Parser extends AUCP_Test_Case {
         }
     }
 
+    /**
+     * XXX: Is it really possible to fix this? Should we fix it? 123 785 zł is actually
+     *      a valid representation for the amount 123785 PLN; the parser is doing
+     *      the right thing.
+     */
     public function test_get_currency_amounts_finds_match_even_if_has_numbers_before() {
-        $this->markTestSkipped( 'It currentyl fails, recognizing 123785 as an amount.' );
+        $this->markTestSkipped( 'It currently fails, recognizing 123785 as an amount.' );
         $this->check_it_detects_a_single_currency( '123 785 zł', 'PLN', 'zł', 785 );
     }
 
+    /**
+     * XXX: Is it really possible to fix this? Can we exclude already matched content
+     *      while trying to find additional currency amounts?
+     *
+     *      It may be possible if we take into account the position of the last matched
+     *      text, that we already know because we track the position of every part
+     *      considered.
+     *
+     *      However, in the text below, which is the right amount: '785 zł' or 'zł 123'?
+     */
     public function test_get_currency_amounts_finds_match_even_if_has_numbers_after() {
-        $this->markTestSkipped( 'It currentyl fails, recognizing two amounts.' );
+        $this->markTestSkipped( 'It currently fails, recognizing two amounts.' );
         $this->check_it_detects_a_single_currency( '785 zł 123', 'PLN', 'zł', 785 );
     }
 
     public function test_get_currency_amounts_finds_several_currencies_in_the_same_text() {
         $text = "10EUR is less than 100 kr but really, I want US$1";
         $this->check_detected_currencies_include( $text, array( 'EUR', 'SEK', 'USD' ) );
+    }
+
+    public function test_get_currency_amounts_return_the_position_of_amount_text() {
+        $parser = new AUCP_Currency_Parser( $this->currencies );
+
+        $text = "The LX10 costs AU$1,000 and does provide equal-or-better photo quality overall than competing 1-inch compacts from Sony and Canon.";
+        $currency_amounts = $parser->get_currency_amounts( $text );
+
+        $this->check_it_detects_a_single_currency( $text, 'AUD', '$', 1000 );
+
+        $start_postion = $currency_amounts[0]['currencies'][0]['position']['start'];
+        $end_postion = $currency_amounts[0]['currencies'][0]['position']['end'];
+
+        $this->assertEquals( 'AU$1,000', mb_substr( $text, $start_postion, $end_postion - $start_postion ) );
     }
 }

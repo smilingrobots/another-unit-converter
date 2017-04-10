@@ -69,17 +69,16 @@ class Another_Unit_Converter_Plugin {
             return $content;
         }
 
-        $replacement_amounts = array();
-        $replacement_amounts_count = 0;
+        $offset = 0;
 
         foreach ( $currency_amounts as $index => $currency_amount ) {
             $currency_info = $currency_amount['currencies'][0];
 
-            if ( ! preg_match( $currency_info['pattern'], $content, $matches ) ) {
-                continue;
-            }
+            $start_position = $currency_info['position']['start'] + $offset;
+            $end_position = $currency_info['position']['end'] + $offset;
 
-            $amount_text = $matches[0];
+            $amount_length = $end_position - $start_position;
+            $amount_text = mb_substr( $content, $start_position, $amount_length );
             $amount = esc_attr( $currency_info['amount'] );
             $symbol = esc_attr( $currency_info['currency']['symbol'] );
             $code = esc_attr( $currency_info['currency']['code'] );
@@ -89,23 +88,12 @@ class Another_Unit_Converter_Plugin {
                 $amount,
                 $symbol,
                 $code,
-                '<amount-attribute-' . $replacement_amounts_count . '>',
-                '<amount-text-' . $replacement_amounts_count . '>'
+                esc_attr( $amount_text ),
+                esc_html( $amount_text )
             );
 
-            $replacement_amounts[ $replacement_amounts_count ] = $amount_text;
-            $replacement_amounts_count = $replacement_amounts_count + 1;
-
-            // replace the first occurence of the amount text
-            if ( $replacement_pos = mb_strpos( $content, $amount_text ) ) {
-                // $content = substr_replace( $content, $formatted_text, $replacement_pos, mb_strlen( $amount_text ) );
-                $content = mb_substr( $content, 0, $replacement_pos ) . $formatted_text . mb_substr( $content, $replacement_pos + mb_strlen( $amount_text ) );
-            }
-        }
-
-        foreach ( $replacement_amounts as $index => $amount_text ) {
-            $content = str_replace( '<amount-attribute-' . $index . '>', esc_attr( $amount_text ), $content );
-            $content = str_replace( '<amount-text-' . $index . '>', esc_html( $amount_text ), $content );
+            $content = mb_substr( $content, 0, $start_position ) . $formatted_text . mb_substr( $content, $end_position );
+            $offset = $offset + mb_strlen( $formatted_text ) - $amount_length;
         }
 
         wp_enqueue_script( 'another-unit-converter-frontend' );
