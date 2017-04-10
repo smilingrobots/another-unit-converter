@@ -11,6 +11,18 @@ class AUCP_Settings {
 
     public function get_settings() {
         $settings = (array) get_option( 'aucp_settings', array() );
+
+        if ( empty( $settings ) ) {
+            // Initialize with defaults.
+            foreach ( $this->get_registered_settings() as $setting_id => $setting ) {
+                if ( ! empty( $setting['default'] ) ) {
+                    $settings[ $setting_id ] = $setting['default'];
+                }
+            }
+
+            update_option( 'aucp_settings', $settings );
+        }
+
         return $settings;
     }
 
@@ -84,18 +96,20 @@ class AUCP_Settings {
             'name'        => _x( 'Default Currency', 'settings', 'another-unit-converter' ),
             'description' => '...',
             'type'        => 'select',
-            'options'     => array_combine( $currencies, $currencies )
+            'options'     => array_combine( $currencies, $currencies ),
+            'default'     => 'USD'
         );
 
         // FIXME: this setting name sucks.
         $settings['amount_display'] = array(
-            'name' => _x( 'Conversion display (after choosing a currency)', 'settings', 'another-unit-converter' ),
+            'name'        => _x( 'Conversion display (after choosing a currency)', 'settings', 'another-unit-converter' ),
             'description' => '',
-            'type' => 'select',
-            'options' => array(
-                'both' => _x( 'Display original and converted amounts', 'settings', 'another-unit-converter' ),
+            'type'        => 'select',
+            'options'     => array(
+                'both'      => _x( 'Display original and converted amounts', 'settings', 'another-unit-converter' ),
                 'converted' => _x( 'Display only the converted amount', 'settings', 'another-unit-converter' )
-            )
+            ),
+            'default'     => 'both'
         );
 
         return apply_filters( 'aucp_registered_settings', $settings );
