@@ -119,7 +119,12 @@ if ( typeof jQuery !== 'undefined' ) {
                 $(this).click(function() {
                     $search.val('').trigger('keyup.aucp').focus();
 
-                    $widget.dialog('option', 'position', { my: 'center top+10', at: 'bottom', of: $(this) });
+                    $widget.dialog('option', 'position', { 
+                        my: 'center top+10', 
+                        at: 'bottom', 
+                        of: $(this), 
+                        collision: 'flipfit flipfit'
+                    });
                     $widget.dialog('open');
                 });
             });
