@@ -38,10 +38,11 @@ if ( typeof jQuery !== 'undefined' ) {
                             roundedAmount = Number(Math.round(newAmount+'e2')+'e-2');
 
                         if ( code == target ) {
+                            $currencyAmount.removeClass( 'aucp-converted' );
                             return;
                         }
 
-                        
+
                         var template = data.rates[target].format_template;
                         var formattedNumber = aucp_number_format( roundedAmount, data.rates[target].decimal_places, data.rates[target].decimal_point, data.rates[target].thousands_separator );
 
