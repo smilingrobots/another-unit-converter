@@ -154,11 +154,7 @@ if ( typeof jQuery !== 'undefined' ) {
             $widget.appendTo( $('body') ).dialog({
                 autoOpen: false,
                 dialogClass: 'aucp-currency-switcher-container',
-                minHeight: 80,
-                open: function( e, ui ) {
-                    // Focus the first currency option.
-                    // $widget.find( '.aucp-currency-switcher-currencies-list-item:first' ).addClass( 'navigation-focus' );
-                }
+                minHeight: 80
             });
 
 
