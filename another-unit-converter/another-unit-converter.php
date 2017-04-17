@@ -99,6 +99,10 @@ class Another_Unit_Converter_Plugin {
         add_action( 'wp_footer', array( $this, 'maybe_print_currency_switcher_template' ) );
     }
 
+    public function plugins_url( $path ) {
+        return plugins_url( $path, __FILE__ );
+    }
+
     public function maybe_print_currency_switcher_template() {
         if ( ! $this->resources->are_frontend_scripts_enqueued() ) {
             return;
