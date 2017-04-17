@@ -12,7 +12,7 @@ class AUCP_Admin {
     public function admin_menu() {
         add_options_page(
             _x( 'Another Unit Converter - Settings', 'admin menu', 'another-unit-converter' ),
-            _x( 'Another Unit Converter', 'admin menu', 'another-unit-converter' ),
+            _x( 'Unit Converter', 'admin menu', 'another-unit-converter' ),
             'administrator',
             'aucp_settings',
             array( $this, 'settings_page' )
