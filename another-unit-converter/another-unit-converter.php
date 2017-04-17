@@ -91,7 +91,8 @@ class Another_Unit_Converter_Plugin {
     }
 
     private function is_external_currency_conversion_api_ready() {
-        return ! empty( $this->settings->get_option( 'currencylayer_key' ) );
+        $api_key = $this->settings->get_option( 'currencylayer_key' );
+        return ! empty( $api_key );
     }
 
     public function frontend_init() {
