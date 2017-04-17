@@ -133,6 +133,29 @@ class AUCP_Settings {
             }
         }
 
+        $previous_api_key = $this->get_option( 'currencylayer_key');
+        $new_api_key = $new_settings['currencylayer_key'];
+
+        if ( ! empty( $new_api_key ) && $previous_api_key != $new_api_key ) {
+            $api_key_valid = false;
+            $request = wp_remote_get( 'http://apilayer.net/api/live?access_key=' . $new_api_key . '&source=USD' );
+
+            if ( ! is_wp_error( $request ) ) {
+                $response = json_decode( wp_remote_retrieve_body( $request ) );
+
+                if ( $response && isset( $response->success ) && $response->success ) {
+                    $api_key_valid = true;
+                }
+            }
+
+            if ( ! $api_key_valid ) {
+                add_settings_error( __( 'Invalid API Key', 'another-unit-converter' ),
+                                    'api_key_error',
+                                    __( 'Please insert a valid API Key.', 'another-unit-converter' ) );
+                $new_settings['currencylayer_key'] = $previous_api_key;
+            }
+        }
+
         return $new_settings;
     }
 
