@@ -55,25 +55,6 @@ if ( typeof jQuery !== 'undefined' ) {
 
             var $widget = $( $('#aucp-currency-switcher-template').html() );
 
-            $( 'body' ).click(function(e) {
-                if ( ! $widget.dialog( 'isOpen' ) ) {
-                    return;
-                }
-
-                var $target = $( e.target );
-
-                if ( $target.closest( '.aucp-currency-amount, .ui-dialog' ).length > 0 ) {
-                    return;
-                }
-
-                $widget.dialog( 'close' );
-            });
-
-            $widget.appendTo( $('body') ).dialog({
-                autoOpen: false,
-                dialogClass: 'aucp-currency-switcher-container',
-                minHeight: 80,
-            });
 
             var ENTER = 13,
                 SPACE = 32,
@@ -82,24 +63,79 @@ if ( typeof jQuery !== 'undefined' ) {
                 RIGHT = 39,
                 LEFT = 37;
 
+            $widget.on( 'keydown', 'input', function(e) {
+                switch ( e.keyCode ) {
+                    case UP:
+                    case DOWN:
+                        // We do this so you can not move inside the textfield usign the up/down arrow keys.
+                        e.preventDefault();
+                        break;
+                    default:
+                        break;
+                }
+            } );
             $widget.on('keyup.aucp', 'input', function(e) {
+                var $items = $( '.aucp-currency-switcher-currencies-list-item' );
+
                 switch ( e.keyCode ) {
                     case ENTER:
+                        var $focused = $items.filter( '.navigation-focus' ).first();
+                        $focused.click();
+                        break;
                     case SPACE:
                         break;
                     case UP:
-                        break;
                     case DOWN:
+                        var delta = e.keyCode == UP ? -1 : 1;
+                        var $focused = $items.filter( '.navigation-focus' );
+
+                        // XXX: Can this happen?
+                        if ( 1 != $focused.length ) {
+                            return;
+                        }
+
+                        var $visible_items = $items.filter( ':visible' );
+                        var new_index = Math.max( 0, Math.min( $visible_items.index( $focused ) + delta, $visible_items.length - 1 ) );
+
+                        $items.removeClass( 'navigation-focus' );
+                        $visible_items.eq( new_index ).addClass( 'navigation-focus' );
+                        $focused = $visible_items.eq( new_index );
+
+                        // Scroll the container to see the element.
+                        var $container = $widget.find( '.aucp-currency-switcher-currencies-list' );
+                        var container_height = $container.height();
+
+                        var t = $focused.position().top;
+                        var h = $focused.outerHeight();
+
+                        if ( t > 0 && ( t + h ) > container_height ) {
+                            $container.scrollTop( $container.scrollTop() + h );
+                        } else if ( t < 0 ) {
+                            $container.scrollTop( $container.scrollTop() + t );
+                        }
+
                         break;
                     default:
                         var search = $(this).val().toLowerCase();
-                        var $allCurrencies = $widget.find('[data-content]').show();
+
+                        $items.show();
+                        $items.removeClass( 'navigation-focus' );
 
                         if ( search.length ) {
-                            $allCurrencies.not('[data-content*="' + search + '"]').hide();
+                            $items.not('[data-content*="' + search + '"]').hide();
+                        }
+
+                        var $visible_items = $items.filter( ':visible' );
+                        if ( $visible_items.length > 0 ) {
+                            $visible_items.first().addClass( 'navigation-focus' );
                         }
                 }
             });
+
+            $widget.on( 'mouseenter', 'ul li', function( e ) {
+                $( this ).siblings().removeClass( 'navigation-focus' );
+                $( this ).addClass( 'navigation-focus' );
+            } );
 
             $widget.on('click', 'ul li', function(e) {
                 var target = $(this).attr('data-code');
@@ -113,20 +149,43 @@ if ( typeof jQuery !== 'undefined' ) {
                 $widget.dialog('close');
             });
 
-            $search = $widget.find('input');
 
-            $('.aucp-currency-amount').each(function() {
-                $(this).click(function() {
-                    $search.val('').trigger('keyup.aucp').focus();
 
-                    $widget.dialog('option', 'position', { 
-                        my: 'center top+10', 
-                        at: 'bottom', 
-                        of: $(this), 
-                        collision: 'flipfit flipfit'
-                    });
-                    $widget.dialog('open');
-                });
+            $widget.appendTo( $('body') ).dialog({
+                autoOpen: false,
+                dialogClass: 'aucp-currency-switcher-container',
+                minHeight: 80,
+                open: function( e, ui ) {
+                    // Focus the first currency option.
+                    // $widget.find( '.aucp-currency-switcher-currencies-list-item:first' ).addClass( 'navigation-focus' );
+                }
+            });
+
+
+            $( 'body' ).on( 'click', '.aucp-currency-amount', function(e) {
+                $widget.dialog( 'option', 'position', {
+                    my: 'center top+10',
+                    at: 'bottom',
+                    of: $(this),
+                    collision: 'flipfit flipfit'
+                } );
+                $widget.dialog( 'open' );
+                $widget.find( 'input' ).val( '' ).trigger( 'keyup.aucp' ).focus();
+            } );
+
+            // Close the switcher when clicking outside of it.
+            $( 'body' ).click(function(e) {
+                if ( ! $widget.dialog( 'isOpen' ) ) {
+                    return;
+                }
+
+                var $target = $( e.target );
+
+                if ( $target.closest( '.aucp-currency-amount, .ui-dialog' ).length > 0 ) {
+                    return;
+                }
+
+                $widget.dialog( 'close' );
             });
 
             // If there's a default target currency, perform conversion.
