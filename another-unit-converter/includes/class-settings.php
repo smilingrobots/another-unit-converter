@@ -86,7 +86,7 @@ class AUCP_Settings {
         );
 
         $settings['currencylayer_key'] = array(
-            'name'        => _x( 'Currency Layer API Key', 'settings', 'another-unit-converter' ),
+            'name'        => _x( 'currencylayer API Key', 'settings', 'another-unit-converter' ),
             'description' => '...',
             'type'        => 'text'
         );
