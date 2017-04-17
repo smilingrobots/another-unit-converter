@@ -81,9 +81,17 @@ class Another_Unit_Converter_Plugin {
             return;
         }
 
+        if ( false && ! $this->is_external_currency_conversion_api_ready() ) {
+            return;
+        }
+
         $this->currency_conversion->maybe_refresh_rates();
 
         add_filter( 'the_content', array( $this, 'format_currency_amounts' ) );
+    }
+
+    private function is_external_currency_conversion_api_ready() {
+        return ! empty( $this->settings->get_option( 'currencylayer_key' ) );
     }
 
     public function frontend_init() {
@@ -92,9 +100,20 @@ class Another_Unit_Converter_Plugin {
     }
 
     public function maybe_print_currency_switcher_template() {
-        if ( $this->resources->are_frontend_scripts_enqueued() ) {
+        if ( ! $this->resources->are_frontend_scripts_enqueued() ) {
+            return;
+        }
+
+        if ( $this->is_external_currency_conversion_api_ready() ) {
             $currencies = $this->currencies->get_currencies();
             include( __DIR__ . '/templates/currency-switcher.tpl.php' );
+        } else {
+            $settings_url = '<a class="aucp-currency-switcher-link" href="' . add_query_arg( 'page', 'aucp_settings', admin_url( 'options-general.php' ) ) . '">';
+
+            $message = _x( 'Once you <a>enter a valid currencylayer API key</a>, this widget will allow vistors to convert currency amounts on this page to one of the supported currencies.', 'currency switcher message', 'another-unit-converter' );
+            $message = str_replace( '<a>', $settings_url, $message );
+
+            include( __DIR__ . '/templates/currency-switcher-not-ready.tpl.php' );
         }
     }
 
