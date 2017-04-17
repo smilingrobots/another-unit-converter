@@ -6,6 +6,7 @@ class AUCP_Admin {
         if ( ! is_admin() )
             return;
 
+        add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
         add_action( 'admin_menu', array( $this, 'admin_menu' ) );
     }
 
@@ -28,6 +29,14 @@ class AUCP_Admin {
         submit_button();
         echo '</form>';
         echo '</div>';
+    }
+
+    public function plugin_row_meta( $links, $file ) {
+        if ( false !== strpos( $file, 'another-unit-converter.php' ) ) {
+            $links['settings'] = '<a href="' . admin_url( 'options-general.php?page=aucp_settings' ) . '">' . _x( 'Plugin Settings', 'plugins page', 'another-unit-converter' ) . '</a>';
+        }
+
+        return $links;
     }
 
 }
