@@ -80,7 +80,6 @@ if ( typeof jQuery !== 'undefined' ) {
             $widget.on('keyup.aucp', 'input', function(e) {
                 var $items = $( '.aucp-currency-switcher-currencies-list-item' );
 
-
                 switch ( e.keyCode ) {
                     case ENTER:
                         var $focused = $items.filter( '.navigation-focus' ).first();
@@ -146,10 +145,6 @@ if ( typeof jQuery !== 'undefined' ) {
                 }
                 $mouse_status = false;
             } );
-
-            $widget.on( 'mouseup', 'ul li', function( e ){
-                $mouse_status = false;
-            });
 
             $widget.on('click', 'ul li', function(e) {
                 var target = $(this).attr('data-code');
