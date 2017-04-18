@@ -74,9 +74,6 @@ if ( typeof jQuery !== 'undefined' ) {
                         break;
                 }
             } );
-
-            var $mouse_status = false;
-
             $widget.on('keyup.aucp', 'input', function(e) {
                 var $items = $( '.aucp-currency-switcher-currencies-list-item' );
 
@@ -89,9 +86,6 @@ if ( typeof jQuery !== 'undefined' ) {
                         break;
                     case UP:
                     case DOWN:
-                        
-                        $mouse_status = true;
-                        
                         var delta = e.keyCode == UP ? -1 : 1;
                         var $focused = $items.filter( '.navigation-focus' );
 
@@ -109,15 +103,19 @@ if ( typeof jQuery !== 'undefined' ) {
 
                         // Scroll the container to see the element.
                         var $container = $widget.find( '.aucp-currency-switcher-currencies-list' );
-                        var container_height = $container.height();
-
-                        var t = $focused.position().top;
-                        var h = $focused.outerHeight();
+                        var container_height = $container.height(),
+                                           t = $focused.position().top,
+                                           h = $focused.outerHeight();
+                        var scroll = false;
 
                         if ( t > 0 && ( t + h ) > container_height ) {
-                            $container.scrollTop( $container.scrollTop() + h );
+                            scroll = $container.scrollTop() + h;
                         } else if ( t < 0 ) {
-                            $container.scrollTop( $container.scrollTop() + t );
+                            scroll = $container.scrollTop() + t;
+                        }
+
+                        if ( false !== scroll ) {
+                            $container.scrollTop( scroll );
                         }
 
                         break;
@@ -126,6 +124,7 @@ if ( typeof jQuery !== 'undefined' ) {
 
                         $items.show();
                         $items.removeClass( 'navigation-focus' );
+                        $items.parent().scrollTop( 0 );
 
                         if ( search.length ) {
                             $items.not('[data-content*="' + search + '"]').hide();
@@ -138,12 +137,23 @@ if ( typeof jQuery !== 'undefined' ) {
                 }
             });
 
-            $widget.on( 'mousemove', 'ul li', function( e ) {
-                if (! $mouse_status){
-                    $( this ).siblings().removeClass( 'navigation-focus' );
-                    $( this ).addClass( 'navigation-focus' );
+            $widget.on( 'blur', 'input', function( e ) {
+                $( this ).focus();
+            } );
+
+            $widget.on( 'mousemove', '', function( e ) {
+                $widget.data( 'aucp_last_cursor_pos', [e.pageX, e.pageY] );
+            } );
+
+            $widget.on( 'mouseenter', 'ul li', function( e ) {
+                var last_pos = $widget.data( 'aucp_last_cursor_pos' );
+
+                if ( last_pos && last_pos[0] == e.pageX && last_pos[1] == e.pageY ) {
+                    return;
                 }
-                $mouse_status = false;
+
+                $( this ).siblings().removeClass( 'navigation-focus' );
+                $( this ).addClass( 'navigation-focus' );
             } );
 
             $widget.on('click', 'ul li', function(e) {
@@ -200,3 +210,5 @@ if ( typeof jQuery !== 'undefined' ) {
         });
     })(jQuery);
 }
+
+
