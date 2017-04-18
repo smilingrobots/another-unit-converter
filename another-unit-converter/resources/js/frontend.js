@@ -74,8 +74,12 @@ if ( typeof jQuery !== 'undefined' ) {
                         break;
                 }
             } );
+
+            var $mouse_status = false;
+
             $widget.on('keyup.aucp', 'input', function(e) {
                 var $items = $( '.aucp-currency-switcher-currencies-list-item' );
+
 
                 switch ( e.keyCode ) {
                     case ENTER:
@@ -86,6 +90,9 @@ if ( typeof jQuery !== 'undefined' ) {
                         break;
                     case UP:
                     case DOWN:
+                        
+                        $mouse_status = true;
+                        
                         var delta = e.keyCode == UP ? -1 : 1;
                         var $focused = $items.filter( '.navigation-focus' );
 
@@ -132,10 +139,17 @@ if ( typeof jQuery !== 'undefined' ) {
                 }
             });
 
-            $widget.on( 'mouseenter', 'ul li', function( e ) {
-                $( this ).siblings().removeClass( 'navigation-focus' );
-                $( this ).addClass( 'navigation-focus' );
+            $widget.on( 'mousemove', 'ul li', function( e ) {
+                if (! $mouse_status){
+                    $( this ).siblings().removeClass( 'navigation-focus' );
+                    $( this ).addClass( 'navigation-focus' );
+                }
+                $mouse_status = false;
             } );
+
+            $widget.on( 'mouseup', 'ul li', function( e ){
+                $mouse_status = false;
+            });
 
             $widget.on('click', 'ul li', function(e) {
                 var target = $(this).attr('data-code');
