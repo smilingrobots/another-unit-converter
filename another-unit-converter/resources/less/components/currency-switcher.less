@@ -37,6 +37,8 @@
     .aucp-overflow-auto;
     .aucp-max-height-xxxl;
     .aucp-border-bottom-radius-medium-small;
+
+    position: relative;
 }
 
 .aucp-currency-switcher-currencies-list-item {
@@ -45,15 +47,17 @@
     .aucp-border-width-0;
     .aucp-border-bottom-width-1;
     .aucp-border-style-solid;
-    .aucp-color-white-hover;
     .aucp-cursor-pointer;
     .aucp-line-height-xs;
     .aucp-padding-xxs;
 
-    .aucp-background-color-primary-color-hover;
-
     .aucp-border-bottom-radius-medium-last-child;
     .aucp-border-width-0-last-child;
+
+    &.navigation-focus {
+        color: @white;
+        background-color: @primary-color;
+    }
 }
 
 .aucp-currency-switcher-currencies-list-item-code {
