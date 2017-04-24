@@ -1,19 +1,19 @@
 <?php
-
 /**
  * Plugin Name: Another Unit Converter
- * Plugin URI:  http://anotherunitconverter.com
- * Description: A universal unit converter for WordPress content.
+ * Plugin URI:  http://smilingrobots.com/plugins/another-unit-converter
+ * Description: The easiest way to do currency conversions in your website, allowing visitors to see amounts on their preferred currency.
  * Version:     0.1-dev-1
  * Author:      Smiling Robots
  * Author URI:  http://smilingrobots.com
- * License:     GPL2
+ * License:     GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Domain Path: /languages
  * Text Domain: another-unit-converter
+ * Domain Path: /languages
  */
 
 require __DIR__ . '/vendor/autoload.php';
+
 
 class Another_Unit_Converter_Plugin {
 
