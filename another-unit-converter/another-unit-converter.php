@@ -12,7 +12,12 @@
  * Domain Path: /languages
  */
 
-require __DIR__ . '/vendor/autoload.php';
+require_once( __DIR__ . '/includes/class-admin.php' );
+require_once( __DIR__ . '/includes/class-currencies.php' );
+require_once( __DIR__ . '/includes/class-currency-conversion.php' );
+require_once( __DIR__ . '/includes/class-currency-parser.php' );
+require_once( __DIR__ . '/includes/class-resources.php' );
+require_once( __DIR__ . '/includes/class-settings.php' );
 
 
 class Another_Unit_Converter_Plugin {
