@@ -40,7 +40,7 @@ if ( typeof jQuery !== 'undefined' ) {
                             amountThousands_separator = data.rates[target].thousands_separator,
                             amountDecimal_point = data.rates[target].decimal_point;
 
-                        if ( code == target) {
+                        if ( code == target ) {
                             $currencyAmount.removeClass( 'aucp-converted' );
                             return;
                         }
