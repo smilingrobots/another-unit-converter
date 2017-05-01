@@ -57,6 +57,8 @@ if ( typeof jQuery !== 'undefined' ) {
                         }
 
                         $currencyAmount.addClass( 'aucp-converted' );
+
+                        $widget.addClass( 'aucp-converted' );
                     })
                 });
             };
