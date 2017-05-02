@@ -15,5 +15,9 @@
         </li>
         <?php endforeach; ?>
     </ul>
+    <div class="aucp-currency-switcher-separator aucp-hide-if-no-conversion"></div>
+    <div class="aucp-currency-switcher-footer aucp-hide-if-no-conversion">
+        <a href="#" class="aucp-currency-switcher-reset"><?php _e( 'Clear Conversion', 'another-unit-converter' ); ?></a>
+    </div>
 </div>
 </script>

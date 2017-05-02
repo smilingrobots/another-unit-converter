@@ -35,21 +35,34 @@ if ( typeof jQuery !== 'undefined' ) {
                             toRate = data.rates[target].rate,
                             newAmount = toRate * (parseFloat(amount) / fromRate),
                             // http://www.jacklmoore.com/notes/rounding-in-javascript/
-                            roundedAmount = Number(Math.round(newAmount+'e2')+'e-2');
+                            roundedAmount = Number(Math.round(newAmount+'e2')+'e-2'),
+                            amountDecimal_places = data.rates[target].decimal_places,
+                            amountThousands_separator = data.rates[target].thousands_separator,
+                            amountDecimal_point = data.rates[target].decimal_point;
 
                         if ( code == target ) {
                             $currencyAmount.removeClass( 'aucp-converted' );
                             return;
                         }
 
-
                         var template = data.rates[target].format_template;
-                        var formattedNumber = aucp_number_format( roundedAmount, data.rates[target].decimal_places, data.rates[target].decimal_point, data.rates[target].thousands_separator );
+                        var formattedNumber = aucp_number_format( roundedAmount, amountDecimal_places, amountDecimal_point, amountThousands_separator );
+                        var title = data.rates[target].name;
 
-                        $currencyAmount.find( '.aucp-converted-text' ).html( template.replace( '<amount>', formattedNumber ) ).attr( 'title', data.rates[target].name );
+                        $currencyAmount.find( '.aucp-converted-text' ).html( template.replace( '<amount>', formattedNumber ) ).attr( 'title', title );
                         $currencyAmount.addClass( 'aucp-converted' );
+
+                        $widget.addClass( 'aucp-converted' );
                     })
                 });
+            };
+            var aucp_reset = function() {
+                $.getJSON( aucp_js.ajaxurl, {
+                    action: 'aucp_reset'
+                } ).done( function( data ) {
+                    $widget.removeClass( 'aucp-converted' );
+                    $( '.aucp-currency-amount' ).removeClass( 'aucp-converted' );
+                } );
             };
 
 
@@ -167,6 +180,12 @@ if ( typeof jQuery !== 'undefined' ) {
 
                 $widget.dialog('close');
             });
+
+            $widget.on( 'click', '.aucp-currency-switcher-reset', function(e) {
+                e.preventDefault();
+                aucp_reset();
+                $widget.dialog('close');
+            } );
 
 
 

@@ -3,7 +3,7 @@
  * Plugin Name: Another Unit Converter
  * Plugin URI:  http://smilingrobots.com/plugins/another-unit-converter
  * Description: The easiest way to do currency conversions in your website, allowing visitors to see amounts on their preferred currency.
- * Version:     1.0
+ * Version:     1.1dev
  * Author:      Smiling Robots
  * Author URI:  http://smilingrobots.com
  * License:     GPLv2 or later
@@ -79,6 +79,8 @@ class Another_Unit_Converter_Plugin {
         add_action( 'wp_ajax_nopriv_aucp_batch_convert', array( $this,'ajax_batch_convert' ) );
         add_action( 'wp_ajax_aucp_remember_currency', array( $this, 'ajax_remember_currency' ) );
         add_action( 'wp_ajax_nopriv_aucp_remember_currency', array( $this,'ajax_remember_currency' ) );
+        add_action( 'wp_ajax_aucp_reset', array( $this, 'ajax_reset' ) );
+        add_action( 'wp_ajax_nopriv_aucp_reset', array( $this,'ajax_reset' ) );
     }
 
     public function init() {
@@ -298,6 +300,14 @@ class Another_Unit_Converter_Plugin {
         }
 
         @setcookie( 'aucp_target_currency', $code, 30 * DAYS_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN );
+        exit;
+    }
+
+    /**
+     * Deletes the current cookie.
+     */
+    public function ajax_reset() {
+        @setcookie( 'aucp_target_currency', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN );
         exit;
     }
 }
