@@ -3,9 +3,9 @@ Contributors: jorgeatorres, dgiraldo, wvega, smilingrobots
 Plugin URI: http://smilingrobots.com/plugins/another-unit-converter
 Donate link: http://smilingrobots.com/donate/
 Tags: currency, converter, conversion, currency switcher, price converter, money
-Requires at least: 4.5
+Requires at least: 4.6
 Tested up to: 4.7
-Stable tag: 1.0
+Stable tag: 1.1
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,6 +75,9 @@ Because we don't like sad robots.
 3. Another Unit Converter settings screen.
 
 == Changelog ==
+
+= 1.1 =
+* Allow users to reset/clear conversion.
 
 = 1.0 =
 * Initial release: a new plugin is born.
