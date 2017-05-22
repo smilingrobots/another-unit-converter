@@ -12,7 +12,7 @@
  * Domain Path: /languages
  */
 
-if ( function_exists( 'mb_strcut' ) ) {
+if ( ! function_exists( 'mb_strcut' ) ) {
     add_action( 'admin_init', 'aucp_add_notice_and_deactivate_plugin' );
 
     function aucp_add_notice_and_deactivate_plugin() {
