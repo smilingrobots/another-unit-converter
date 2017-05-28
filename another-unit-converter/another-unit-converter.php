@@ -3,7 +3,7 @@
  * Plugin Name: Another Unit Converter
  * Plugin URI:  http://smilingrobots.com/plugins/another-unit-converter
  * Description: The easiest way to do currency conversions in your website, allowing visitors to see amounts on their preferred currency.
- * Version:     1.1
+ * Version:     1.1.1
  * Author:      Smiling Robots
  * Author URI:  http://smilingrobots.com
  * License:     GPLv2 or later

@@ -5,7 +5,7 @@ Donate link: http://smilingrobots.com/donate/
 Tags: currency, converter, conversion, currency switcher, price converter, money
 Requires at least: 4.6
 Tested up to: 4.7
-Stable tag: 1.1
+Stable tag: 1.1.1
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,9 @@ Because we don't like sad robots.
 
 == Changelog ==
 
+= 1.1.1 =
+- Prevent Fatal when mbstring extension is not available (#42).
+
 = 1.1 =
 * Allow users to reset/clear conversion.
 
@@ -83,6 +86,9 @@ Because we don't like sad robots.
 * Initial release: a new plugin is born.
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+- Prevent Fatal when mbstring extension is not available (#42).
 
 = 1.0 =
 The easiest way to enable currency conversion in your WordPress website.
