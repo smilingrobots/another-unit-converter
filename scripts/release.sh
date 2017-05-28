@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Taken from https://github.com/mikejolley/github-to-wordpress-deploy-script
+# Taken from https://github.com/wvega/github-to-wordpress-deploy-script/
 #
 # Also interesting:
 # - https://github.com/felixarntz/wp-encrypt/blob/master/deploy.sh
@@ -79,7 +79,7 @@ rm -Rf $ROOT_PATH$TEMP_GITHUB_REPO
 if [[ ! -d $TEMP_SVN_REPO ]];
 then
 	echo "Checking out WordPress.org plugin repository"
-	svn checkout $SVN_REPO $TEMP_SVN_REPO || { echo "Unable to checkout repo."; exit 1; }
+	svn checkout --non-recursive $SVN_REPO $TEMP_SVN_REPO || { echo "Unable to checkout repo."; exit 1; }
 fi
 
 # CLONE GIT DIR
@@ -134,7 +134,8 @@ cd $ROOT_PATH$TEMP_SVN_REPO
 
 # UPDATE SVN
 echo "Updating SVN"
-svn update || { echo "Unable to update SVN."; exit 1; }
+svn update --set-depth immediates tags || { echo "Unable to update empty tags directories."; exit 1; }
+svn update --set-depth infinity trunk || { echo "Unable to update trunk directory."; exit 1; }
 
 # DELETE ASSETS
 echo "Replacing assets"
@@ -184,7 +185,6 @@ RESULT=$(curl --data "${API_JSON}" https://api.github.com/repos/${GITHUB_REPO_OW
 echo ""
 echo "Committing to WordPress.org...this may take a while..."
 svn commit --no-auth-cache --username $WP_ORG_USERNAME --password $WP_ORG_PASSWORD -m "Release "${VERSION}", see readme.txt for the changelog." || { echo "Unable to commit."; exit 1; }
-
 
 # REMOVE THE TEMP DIRS
 echo "CLEANING UP"
