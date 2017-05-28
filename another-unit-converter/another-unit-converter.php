@@ -12,6 +12,27 @@
  * Domain Path: /languages
  */
 
+if ( ! function_exists( 'mb_strcut' ) ) {
+    add_action( 'admin_init', 'aucp_add_notice_and_deactivate_plugin' );
+
+    function aucp_add_notice_and_deactivate_plugin() {
+        add_action( 'admin_notices', 'aucp_missing_required_mbstring_extension' );
+        deactivate_plugins( plugin_basename( __FILE__ ) );
+    }
+
+    function aucp_missing_required_mbstring_extension() {
+        $message = esc_html__( 'The {plugin-name} plugin requires the {multibyte-link}Multibyte String{/multibyte-link} PHP extension to work. Please ask your web host to install or enable it for your website.', 'another-unit-converter' );
+
+        $message = str_replace( '{plugin-name}', '<strong>Another Unit Converter</strong>', $message );
+        $message = str_replace( '{multibyte-link}', '<a href="http://php.net/manual/en/book.mbstring.php">', $message );
+        $message = str_replace( '{/multibyte-link}', '</a>', $message );
+
+        echo '<div class="aucp-notice notice notice-error"><p>' . $message . '</p></div>';
+    }
+
+    return;
+}
+
 require_once( __DIR__ . '/includes/class-admin.php' );
 require_once( __DIR__ . '/includes/class-currencies.php' );
 require_once( __DIR__ . '/includes/class-currency-conversion.php' );
