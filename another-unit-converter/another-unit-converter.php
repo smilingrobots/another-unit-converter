@@ -35,6 +35,7 @@ if ( ! function_exists( 'mb_strcut' ) ) {
 
 require_once( __DIR__ . '/includes/class-another-unit-converter-plugin.php' );
 require_once( __DIR__ . '/includes/class-admin.php' );
+require_once( __DIR__ . '/includes/class-convert-currency-shortcode.php' );
 require_once( __DIR__ . '/includes/class-currencies.php' );
 require_once( __DIR__ . '/includes/class-currency-conversion.php' );
 require_once( __DIR__ . '/includes/class-currency-parser.php' );

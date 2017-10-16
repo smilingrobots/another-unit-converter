@@ -40,8 +40,7 @@ class Another_Unit_Converter_Plugin {
 
     public function plugins_loaded() {
         add_action( 'init', array( $this, 'init' ) );
-
-        add_action( 'wp_enqueue_scripts', array( $this->resources, 'register_scripts_and_styles' ) );
+        add_action( 'init', array( $this, 'register_shortcodes' ) );
 
         if ( ! defined( 'DOING_AJAX' ) && ! is_admin() ) {
             $this->frontend_init();
@@ -50,6 +49,8 @@ class Another_Unit_Converter_Plugin {
         if ( is_admin() ) {
             $this->admin = new AUCP_Admin();
         }
+
+        add_action( 'wp_enqueue_scripts', array( $this->resources, 'register_scripts_and_styles' ) );
 
         add_action( 'wp_ajax_aucp_get_rates', array( $this, 'ajax_get_rates' ) );
         add_action( 'wp_ajax_nopriv_aucp_get_rates', array( $this,'ajax_get_rates' ) );
@@ -163,6 +164,11 @@ class Another_Unit_Converter_Plugin {
         }
 
         return reset( $currencies );
+    }
+
+    public function register_shortcodes() {
+        $shortcode_handler = new AUCP_Convert_Currency_Shortcode( $this->currency_conversion );
+        add_shortcode( 'aucp-convert-currency', array( $shortcode_handler, 'do_shortcode' ) );
     }
 
     public function ajax_get_rates() {
