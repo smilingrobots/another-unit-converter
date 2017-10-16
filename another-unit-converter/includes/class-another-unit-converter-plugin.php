@@ -133,7 +133,7 @@ class Another_Unit_Converter_Plugin {
             $html  = '';
             $html .= '<span class="aucp-currency-amount" data-unit-converter-currency-amount="%1$s" data-unit-converter-currency-symbol="%2$s" data-unit-converter-currency-code="%3$s">';
             $html .= '<span class="aucp-converted-text">%5$s</span>';
-            $html .= '<span class="aucp-original-text ' . ( 'converted' == AUCP()->settings->get_option( 'amount_display', 'both' ) ? 'aucp-keep-hidden' : '' ) . '" title="%6$s">%5$s</span>';
+            $html .= '<span class="aucp-original-text ' . ( 'converted' == $this->settings->get_option( 'amount_display', 'both' ) ? 'aucp-keep-hidden' : '' ) . '" title="%6$s">%5$s</span>';
             $html .= '</span>';
 
             $formatted_text = sprintf(
