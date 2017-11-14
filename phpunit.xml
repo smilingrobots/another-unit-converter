@@ -2,7 +2,7 @@
     bootstrap="tests/bootstrap.php">
     <testsuites>
         <testsuite name="Another Unit Converter Test Suite">
-            <directory prefix="test-" suffix=".php">tests/suite/</directory>
+            <directory prefix="" suffix="Test.php">tests/suite/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

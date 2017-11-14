@@ -1,12 +1,22 @@
 <?php
 
-class AUCP_Test_Currencies extends AUCP_Test_Case {
+namespace AUCP\Tests;
+
+use AUCP\Tests\TestCase;
+
+use AUCP_Currencies;
+
+class CurrenciesTest extends TestCase {
 
     public function test_find_currencies_by_symbol() {
         $currencies = new AUCP_Currencies();
 
         $currencies_found = $currencies->find_currencies_by_symbol( '$' );
-        $currency_codes = wp_list_pluck( $currencies_found, 'code' );
+        $currency_codes = array();
+
+        foreach( $currencies_found as $currency ) {
+            $currency_codes[] = $currency['code'];
+        }
 
         $this->assertContains( 'USD', $currency_codes );
         $this->assertContains( 'AUD', $currency_codes );

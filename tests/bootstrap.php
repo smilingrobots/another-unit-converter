@@ -1,12 +1,10 @@
 <?php
 
-$loader = require dirname(__DIR__) . '/another-unit-converter/vendor/autoload.php';
+require dirname(__DIR__) . '/another-unit-converter/vendor/antecedent/patchwork/Patchwork.php';
+require dirname(__DIR__) . '/another-unit-converter/vendor/autoload.php';
 
-Phake::setClient(Phake::CLIENT_PHPUNIT);
+Phake::setClient( Phake::CLIENT_PHPUNIT );
 
-require getenv( 'WP_TESTS_DIR' ) . '/includes/functions.php';
-require getenv( 'WP_TESTS_DIR' ) . '/includes/bootstrap.php';
+/* Empty definitions for WordPress functions and classes we use */
+require dirname(__DIR__) . '/tests/wordpress/functions.php';
 
-require __DIR__ . '/includes/class-aucp-test-case.php';
-
-require dirname(__DIR__) . '/another-unit-converter/another-unit-converter.php';

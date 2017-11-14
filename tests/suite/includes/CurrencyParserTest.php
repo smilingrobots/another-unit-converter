@@ -1,9 +1,17 @@
 <?php
 
+namespace AUCP\Tests;
+
+use Phake;
+
+use AUCP\Tests\TestCase;
+
+use AUCP_Currency_Parser;
+
 /**
  * See https://github.com/RubyMoney/money/blob/master/spec/currency/heuristics_spec.rb
  */
-class AUCP_Test_Currency_Parser extends AUCP_Test_Case {
+class CurrencyParserTest extends TestCase {
 
     public function setup() {
         parent::setup();

@@ -1,8 +1,27 @@
 <?php
 
-class AUCP_Test_Another_Unit_Converter extends AUCP_Test_Case {
+namespace AUCP\Tests;
+
+use Phake;
+
+use function Patchwork\{redefine, always};
+
+use AUCP\Tests\TestCase;
+
+use Another_Unit_Converter_Plugin;
+use AUCP_Currency_Parser;
+
+class AnotherUnitConverterTest extends TestCase {
 
     public function test_format_currency_amounts() {
+        redefine( 'esc_attr', function( $text ) {
+            return $text;
+        } );
+
+        redefine( 'esc_html', function( $text ) {
+            return $text;
+        } );
+
         $this->currency_parser = Phake::mock( 'AUCP_Currency_Parser' );
 
         Phake::when( $this->currency_parser )->get_currency_amounts->thenReturn( array( array(
@@ -40,3 +59,4 @@ class AUCP_Test_Another_Unit_Converter extends AUCP_Test_Case {
         $this->assertContains( 'data-unit-converter-currency-code="COP"', $formatted_content );
     }
 }
+

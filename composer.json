@@ -3,10 +3,14 @@
         "vendor-dir": "another-unit-converter/vendor"
     },
     "require-dev": {
+        "antecedent/patchwork": "*",
         "phake/phake": "2.*",
         "phpunit/phpunit": "5.*"
     },
     "autoload": {
+        "psr-4": {
+            "AUCP\\Tests\\": ["tests/includes/", "tests/suite/"]
+        },
         "classmap": ["another-unit-converter/"]
     }
 }
