@@ -4,6 +4,8 @@ class Another_Unit_Converter_Plugin {
 
     private static $instance = null;
 
+    private $plugin_file;
+
     private $currency_parser;
     private $currency_conversion;
     public $currencies;
@@ -12,23 +14,26 @@ class Another_Unit_Converter_Plugin {
     private $resources;
 
 
-    public static function instance() {
+    public static function instance( $plugin_file ) {
         if ( is_null( self::$instance ) ) {
             $currencies = new AUCP_Currencies();
 
             self::$instance = new self(
+                $plugin_file,
                 new AUCP_Currency_Parser( $currencies ),
                 new AUCP_Currency_Conversion(),
                 $currencies,
                 new AUCP_Settings(),
-                new AUCP_Resources( plugin_dir_url( __FILE__ ) )
+                new AUCP_Resources( plugin_dir_url( $plugin_file ) )
             );
         }
 
         return self::$instance;
     }
 
-    public function __construct( $currency_parser, $currency_conversion, $currencies, $settings, $resources ) {
+    public function __construct( $plugin_file, $currency_parser, $currency_conversion, $currencies, $settings, $resources ) {
+        $this->plugin_file = $plugin_file;
+
         $this->currency_parser = $currency_parser;
         $this->currency_conversion = $currency_conversion;
         $this->currencies = $currencies;
@@ -88,7 +93,7 @@ class Another_Unit_Converter_Plugin {
     }
 
     public function plugins_url( $path ) {
-        return plugins_url( $path, __FILE__ );
+        return plugins_url( $path, $this->plugin_file );
     }
 
     public function maybe_print_currency_switcher_template() {
@@ -96,16 +101,18 @@ class Another_Unit_Converter_Plugin {
             return;
         }
 
+        $plugin_dir = dirname( $this->plugin_file );
+
         if ( $this->is_external_currency_conversion_api_ready() ) {
             $currencies = $this->currencies->get_currencies();
-            include( __DIR__ . '/templates/currency-switcher.tpl.php' );
+            include( $plugin_dir . '/templates/currency-switcher.tpl.php' );
         } else {
             $settings_url = '<a class="aucp-currency-switcher-link" href="' . add_query_arg( 'page', 'aucp_settings', admin_url( 'options-general.php' ) ) . '">';
 
             $message = _x( 'Once you <a>enter a valid currencylayer API key</a>, this widget will allow vistors to convert currency amounts on this page to one of the supported currencies.', 'currency switcher message', 'another-unit-converter' );
             $message = str_replace( '<a>', $settings_url, $message );
 
-            include( __DIR__ . '/templates/currency-switcher-not-ready.tpl.php' );
+            include( $plugin_dir . '/templates/currency-switcher-not-ready.tpl.php' );
         }
     }
 

@@ -42,7 +42,7 @@ require_once( __DIR__ . '/includes/class-resources.php' );
 require_once( __DIR__ . '/includes/class-settings.php' );
 
 function AUCP() {
-    return Another_Unit_Converter_Plugin::instance();
+    return Another_Unit_Converter_Plugin::instance( __FILE__ );
 }
 
 // Get things going.
