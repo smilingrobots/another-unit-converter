@@ -4,8 +4,8 @@ Plugin URI: http://smilingrobots.com/plugins/another-unit-converter
 Donate link: http://smilingrobots.com/donate/
 Tags: currency, converter, conversion, currency switcher, price converter, money
 Requires at least: 4.6
-Tested up to: 4.7
-Stable tag: 1.1.1
+Tested up to: 5.2
+Stable tag: 1.1.2
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,8 +76,11 @@ Because we don't like sad robots.
 
 == Changelog ==
 
+= 1.1.2 =
+* Fix PHP Warning in class-currency-conversion.php.
+
 = 1.1.1 =
-- Prevent Fatal when mbstring extension is not available (#42).
+* Prevent Fatal when mbstring extension is not available (#42).
 
 = 1.1 =
 * Allow users to reset/clear conversion.
