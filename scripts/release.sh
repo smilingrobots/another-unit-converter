@@ -31,7 +31,7 @@ GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN-token}
 PLUGIN_SLUG=${PLUGIN_SLUG-another-unit-converter}
 
 # GITHUB user who owns the repo
-GITHUB_REPO_OWNER=${GITHUB_REPO_OWNER-wvega}
+GITHUB_REPO_OWNER=${GITHUB_REPO_OWNER-smilingrobots}
 
 # GITHUB Repository name
 GITHUB_REPO_NAME=${GITHUB_REPO_NAME-another-unit-converter}
