@@ -24,6 +24,14 @@ class AUCP_Currency_Conversion {
             $result[ $currency_id ]['rate'] = $factor;
 
             $currency = AUCP()->currencies->get_currency( $currency_id );
+
+            // We currently don't include information for the following currencies:
+            //
+            // BTC, GGP, GNF, IMP, JEP, SDG, XAG, XAU, XDR, XOF, ZWL.
+            if ( ! is_array( $currency ) ) {
+                continue;
+            }
+
             $result[ $currency_id ] = array_merge( $result[ $currency_id ], $currency );
 
             // FIXME: this is harcoded (for now!)
