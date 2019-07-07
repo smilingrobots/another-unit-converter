@@ -136,6 +136,7 @@ cd $ROOT_PATH$TEMP_SVN_REPO
 echo "Updating SVN"
 svn update --set-depth immediates tags || { echo "Unable to update empty tags directories."; exit 1; }
 svn update --set-depth infinity trunk || { echo "Unable to update trunk directory."; exit 1; }
+svn update --set-depth infinity assets || { echo "Unable to update assets directory."; exit 1; }
 
 # DELETE ASSETS
 echo "Replacing assets"
